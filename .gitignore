@@ -1,12 +1,15 @@
 # because i dont trust you guys
-/.vscode
-/__MACOSX
+.vscode
+__MACOSX
 
 # Flask environment file
 .flaskenv
 
+# Python-generated files
+__pycache__
+
 # elm-package generated files
-/elm-stuff
+elm-stuff
 
 # elm-repl generated files
-/repl-temp-*
+repl-temp-*
