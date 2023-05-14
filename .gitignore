@@ -2,6 +2,9 @@
 /.vscode
 /__MACOSX
 
+# environment file
+.env
+
 # elm-package generated files
 /elm-stuff
 
