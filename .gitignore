@@ -1,5 +1,6 @@
 # because i dont trust you guys
 /.vscode
+/__MACOSX
 
 # elm-package generated files
 /elm-stuff
