@@ -1,3 +1,7 @@
 # https://pymongo.readthedocs.io/en/stable/index.html
-import pymongo
+from dotenv import load_dotenv
 import json
+import os
+import pymongo
+
+load_dotenv()
