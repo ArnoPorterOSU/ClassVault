@@ -6,5 +6,6 @@ load_dotenv()
 app = Flask(__name__)
 
 @app.route('/')
-def hello_world():
-    return '<p>Hello, world</p>'
+def main():
+    with open('index.html', 'r') as f:
+        return f.read()

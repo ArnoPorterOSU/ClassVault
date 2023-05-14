@@ -1,15 +1,17 @@
-module Types exposing
+module Types.Student exposing
     ( Student
     , Name
     , Address
     )
+
+import Types.Email exposing (Email)
 
 -- STUDENT TYPE
 
 type alias Student =
     { name : Name
     , id : Int
-    , email : String
+    , email : Email
     , gpa : Float
     , address : Address
     -- TODO: Add attendance records to this somehow
@@ -20,15 +22,15 @@ type alias Student =
 
 type alias Name =
     { first : String
-    , middles : List String
     , last : String
+    , middles : List String
     }
 
 
 -- ADDRESS TYPE
 
 type alias Address =
-    { streetAddress : String
+    { street : String
     , zipCode : Int
     , city : String
     , state : String
