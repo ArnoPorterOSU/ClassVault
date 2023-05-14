@@ -1,7 +1,7 @@
-# https://pymongo.readthedocs.io/en/stable/index.html
 from dotenv import load_dotenv
-import json
-import os
-import pymongo
+from flask import Flask
 
 load_dotenv()
+
+app = Flask(__name__)
+app.config.from_envvar('PORT')

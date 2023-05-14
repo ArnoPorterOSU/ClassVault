@@ -2,8 +2,8 @@
 /.vscode
 /__MACOSX
 
-# environment file
-.env
+# Flask environment file
+.flaskenv
 
 # elm-package generated files
 /elm-stuff
