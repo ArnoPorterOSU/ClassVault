@@ -1,4 +1,8 @@
-module Types exposing (Student, Name, Address)
+module Types exposing
+    ( Student
+    , Name
+    , Address
+    )
 
 -- STUDENT TYPE
 
