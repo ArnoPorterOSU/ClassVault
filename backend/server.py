@@ -4,4 +4,7 @@ from flask import Flask
 load_dotenv()
 
 app = Flask(__name__)
-app.config.from_envvar('PORT')
+
+@app.route('/')
+def hello_world():
+    return '<p>Hello, world</p>'
