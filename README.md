@@ -8,7 +8,7 @@
 
 * [Elm](https://guide.elm-lang.org/install/elm.html). Elm is a functional programming language for frontend web development.
 * [Python 3.11](https://www.python.org/downloads/). Don't forget about `pip`.
-* [MongoDB Community Edition](https://www.mongodb.com/try/download/community)
+* [MongoDB Community Edition](https://www.mongodb.com/try/download/community).
 
 ## Getting Started
 
