@@ -1,4 +1,7 @@
-module Types.Email exposing (Email, toString)
+module Types.Email exposing
+    ( Email
+    , toString
+    )
 
 -- The Email type exists so that ordinary strings
 -- are never confused for Emails

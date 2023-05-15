@@ -1,4 +1,7 @@
-module Types.Address exposing (Address, toString)
+module Types.Address exposing
+    ( Address
+    , toString
+    )
 
 
 import Json.Decode as D exposing (Decoder)
