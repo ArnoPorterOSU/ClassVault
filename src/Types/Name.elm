@@ -21,6 +21,7 @@ toString name =
     name.first ++ List.foldr (++) " " (List.map ((++) " ") name.middles) ++ name.last
 
 
+-- Decoder to decode a name from JSON
 decode : Decoder Name
 decode =
     D.map3 Name
