@@ -5,6 +5,7 @@ import Element.Background as Bg
 import Element.Input as Inp
 import Html exposing (Html)
 import Types.Student exposing (Student)
+import Types.Name as Name
 
 
 -- VIEW
@@ -37,7 +38,7 @@ noTable =
 studentTable : List Student -> Html Msg
 studentTable =
     El.layout [] << El.column [] <<
-        List.map (El.el [ El.mouseOver [ Bg.color <| El.rgb255 128 128 0 ] ])
+        List.map (El.el [ El.mouseOver [ Bg.color <| El.rgb255 128 128 0 ] ] << El.text << Name.toString << .name)
 
 
 -- MSG
