@@ -1,6 +1,7 @@
 module Page.Home exposing (..)
 
 import Element as El exposing (Attribute)
+import Element.Background as Bg
 import Element.Input as Inp
 import Html exposing (Html)
 import Types.Student exposing (Student)
@@ -34,14 +35,10 @@ noTable =
             ]
 
 studentTable : List Student -> Html Msg
-studentTable students =
-    El.layout [] <|
-        El.table []
-            { data = students 
-            , columns =
-                [ 
-                ]
-            }
+studentTable =
+    El.layout [] << El.column [] <<
+        List.map (El.el [ El.mouseOver [Bg.color <| El.rgb255 128 128 0] ])
+
 
 -- MSG
 
