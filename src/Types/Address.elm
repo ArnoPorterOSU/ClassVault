@@ -19,6 +19,7 @@ toString addr =
     addr.street ++ " " addr.city ++ ", " ++ addr.state ++ " " ++ String.fromInt addr.zipCode
 
 
+-- Decodes an Address
 decode : Decoder Address
 decode =
     D.map4
