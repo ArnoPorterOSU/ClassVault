@@ -2,6 +2,8 @@ module Types.Student exposing
     ( Student
     , Name
     , Address
+    -- reexports
+    , Email 
     )
 
 import Types.Email exposing (Email)
