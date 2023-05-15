@@ -1,12 +1,10 @@
 module Types.Student exposing
     ( Student
-    , Name
     , Address
-    -- reexports
-    , Email 
     )
 
 import Types.Email exposing (Email)
+import Types.Name exposing (Name)
 
 -- STUDENT TYPE
 
@@ -16,18 +14,7 @@ type alias Student =
     , email : Email
     , gpa : Float
     , address : Address
-    -- TODO: Add attendance records to this somehow
     }
-
-
--- NAME TYPE
-
-type alias Name =
-    { first : String
-    , last : String
-    , middles : List String
-    }
-
 
 -- ADDRESS TYPE
 
