@@ -37,7 +37,7 @@ noTable =
 studentTable : List Student -> Html Msg
 studentTable =
     El.layout [] << El.column [] <<
-        List.map (El.el [ El.mouseOver [Bg.color <| El.rgb255 128 128 0] ])
+        List.map (El.el [ El.mouseOver [ Bg.color <| El.rgb255 128 128 0 ] ])
 
 
 -- MSG
