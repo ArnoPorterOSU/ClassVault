@@ -9,10 +9,10 @@ import Json.Decode as D exposing (Decoder)
 
 -- The Address datatype
 type alias Address =
-    { street : String
-    , city : String
-    , state : String
-    , zipCode : Int
+    {   street : String
+    ,   city : String
+    ,   state : String
+    ,   zipCode : Int
     }
 
 
