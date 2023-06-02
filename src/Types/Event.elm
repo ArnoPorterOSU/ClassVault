@@ -21,9 +21,9 @@ type alias Milliseconds =
 -- where: the event's location
 -- duration: how long the event lasts, in milliseconds as a Float
 type alias Event =
-    { when : Time.Posix
-    , what : String
-    , where : String
+    { start : Time.Posix
+    , name : String
+    , location : String
     , duration : Milliseconds
     }
 
@@ -32,9 +32,9 @@ type alias Event =
 encode : Event -> Value
 encode event =
     E.object
-        [ ("when", E.int <| Time.posixToMillis event.when)
-        , ("what", E.string event.what)
-        , ("where", E.string event.where)
+        [ ("start", E.int <| Time.posixToMillis event.start)
+        , ("name", E.string event.name)
+        , ("location", E.string event.location)
         , ("duration", E.float event.duration)
         ]
 
@@ -43,7 +43,7 @@ encode event =
 decode : Decoder Event
 decode =
     D.map4 Event
-        (D.map Time.millisToPosix <| D.field "when" D.int)
-        (D.field "what" D.string)
-        (D.field "where" D.string)
+        (D.map Time.millisToPosix <| D.field "start" D.int)
+        (D.field "name" D.string)
+        (D.field "location" D.string)
         (D.field "duration" D.float)

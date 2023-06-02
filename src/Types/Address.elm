@@ -22,7 +22,7 @@ type alias Address =
 -- Converts an Address into a String
 toString : Address -> String
 toString addr =
-    addr.street ++ " " addr.city ++ ", " ++ addr.state ++ " " ++ String.fromInt addr.zipCode
+    addr.street ++ " " ++ addr.city ++ ", " ++ addr.state ++ " " ++ String.fromInt addr.zipCode
 
 
 -- Encodes an Address into JSON
