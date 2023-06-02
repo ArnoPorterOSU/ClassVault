@@ -7,12 +7,12 @@ import Element as El exposing (Element, Color)
 import Element.Region as Reg
 import Element.Background as Bg
 import Element.Font as Font
+import Html
 import Json.Decode as D exposing (Value, Decoder)
 import Page.Home as Home
 import Route
 import Url exposing (Url)
 import Util exposing (uncurry)
-import Platform.Cmd as Cmd
 import Platform.Cmd as Cmd
 
 
@@ -141,6 +141,9 @@ view model =
             , navButton "Stats"
             , navButton "Calendar"
             ]
+        ,   case model.page of
+                Home hmodel ->
+                    Html.map GotHomeMsg <| Home.view hmodel
         ]
     }
 
