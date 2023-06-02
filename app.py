@@ -40,14 +40,4 @@ def read():
 
 @app.route('/raf')
 def raf():
-    """
-    @dataclass
-    class Raf:
-        TAs : dict[str, TA] = field(default_factory=dict)
-    
-        @property
-        def TAs():
-            return...
-    """
-
     return '<img src="static/raf.jpg" />'
