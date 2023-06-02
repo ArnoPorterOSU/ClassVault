@@ -13,3 +13,6 @@ elm-stuff
 
 # elm-repl generated files
 repl-temp-*
+
+# elm compile products
+static
