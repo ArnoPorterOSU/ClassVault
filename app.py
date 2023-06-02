@@ -15,6 +15,7 @@ STATIC_RESOURCES = (
     'favicon.ico',
     'site.webmanifest'
 )
+
 @app.route('/')
 def main():
     for resource in STATIC_RESOURCES:
