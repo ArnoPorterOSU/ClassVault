@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from flask import Flask, url_for
+from flask import Flask, url_for, request
 
 load_dotenv()
 
@@ -16,6 +16,7 @@ STATIC_RESOURCES = (
     'site.webmanifest'
 )
 
+
 @app.route('/')
 def main():
     for resource in STATIC_RESOURCES:
@@ -23,3 +24,30 @@ def main():
 
     with open('index.html', 'r') as f:
         return f.read()
+
+
+@app.route('/create', methods=('GET', 'POST'))
+def create():
+    # create an entry in the database based on request data
+    pass
+
+
+@app.route('/read')
+def read():
+    # read an entry from the database based on request data
+    pass
+
+
+@app.route('/raf')
+def raf():
+    """
+    @dataclass
+    class Raf:
+        TAs : dict[str, TA] = field(default_factory=dict)
+    
+        @property
+        def TAs():
+            return...
+    """
+
+    return '<img src="static/raf.jpg" />'
