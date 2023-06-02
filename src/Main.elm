@@ -131,19 +131,21 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "ClassVault"
     , body =
-        [ El.layout [] <| El.row
-            [ El.width <| El.px model.width
-            , El.spacing standardSpacing
-            , Reg.navigation
-            , Bg.color navColor
+        [ El.layout [] <| El.column []
+            [ El.row
+                [ El.width <| El.px model.width
+                , El.spacing standardSpacing
+                , Reg.navigation
+                , Bg.color navColor
+                ]
+                [ navButton "Home"
+                , navButton "Stats"
+                , navButton "Calendar"
+                ]
+            ,   case model.page of
+                    Home hmodel ->
+                        El.map GotHomeMsg <| Home.view hmodel
             ]
-            [ navButton "Home"
-            , navButton "Stats"
-            , navButton "Calendar"
-            ]
-        ,   case model.page of
-                Home hmodel ->
-                    Html.map GotHomeMsg <| Home.view hmodel
         ]
     }
 
