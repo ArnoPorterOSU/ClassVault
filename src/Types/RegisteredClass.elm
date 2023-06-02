@@ -9,6 +9,10 @@ import Types.Class as Class exposing (Class)
 import Types.Attendance as Attendance exposing (Attendance)
 
 
+-- The RegisteredClass record consists of the following fields:
+-- class: A Class object, representing the underlying class
+-- grade: A Float representing the grade in the class
+-- attendance: A list of Attendance records
 type alias RegisteredClass =
     {   class : Class
     ,   grade : Float
@@ -16,6 +20,7 @@ type alias RegisteredClass =
     }
 
 
+-- JSON decoder for a RegisteredClass object
 decode : Decoder RegisteredClass
 decode =
     D.map3 RegisteredClass

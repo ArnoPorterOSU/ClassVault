@@ -8,7 +8,10 @@ module Types.Name exposing
 import Json.Decode as D exposing (Decoder)
 
 
--- Name 
+-- Name record, consisting of the following fields:
+-- first: A first name
+-- last: A last name
+-- middles: A list of middle names; potentially empty
 type alias Name = 
     {   first : String
     ,   last : String

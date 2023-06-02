@@ -26,6 +26,7 @@ type alias Class =
     }
 
 
+-- JSON decoder for a Class object
 decode : Decoder Class
 decode =
     D.map6 Class

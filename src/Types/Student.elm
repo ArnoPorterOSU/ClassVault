@@ -11,7 +11,13 @@ import Types.Address as Address exposing (Address)
 import Types.RegisteredClass as RC exposing (RegisteredClass)
 
 
--- The Student datatype
+-- The Student datatype, consisting of the following fields:
+-- name: The student's name, as a Name record
+-- id: The student's identifier
+-- email: The student's email address
+-- gpa: The student's GPA, represented as a float
+-- address: The student's address, as an Address record
+-- classes: A dictionary keyed by class names, representing the student's registered classes
 type alias Student =
     {   name : Name
     ,   id : Int
