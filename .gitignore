@@ -15,4 +15,4 @@ elm-stuff
 repl-temp-*
 
 # elm compile products
-static
+static/elm.js
