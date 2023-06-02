@@ -1,6 +1,6 @@
 module Types.Email exposing
-    ( Email
-    , toString
+    (   Email
+    ,   toString
     )
 
 -- The Email type exists so that ordinary strings

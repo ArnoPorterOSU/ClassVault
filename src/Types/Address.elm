@@ -1,6 +1,7 @@
 module Types.Address exposing
-    ( Address
-    , toString
+    (   Address
+    ,   toString
+    ,   decode
     )
 
 
@@ -25,7 +26,7 @@ toString addr =
 -- Decodes an Address
 decode : Decoder Address
 decode =
-    D.map4
+    D.map4 Address
         (D.field "street" D.string)
         (D.field "city" D.string)
         (D.field "state" D.string)
