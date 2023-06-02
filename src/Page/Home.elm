@@ -10,7 +10,7 @@ module Page.Home exposing
 
 import Html exposing (Html)
 import Http
-import Element as El
+import Element as El exposing (Element)
 import Element.Font as Font
 import Json.Decode as D
 import Types.Name as Name
@@ -44,35 +44,33 @@ update msg _ =
 
 
 -- VIEW
-view : Model -> Html msg
+view : Model -> Element Msg
 view model =
-    El.layoutWith
-        { options = [El.noStaticStyleSheet] } [] <|
-            case model of
-                Students students ->
-                    El.table []
-                        { data = students
-                        , columns =
-                            [ { header = El.text "Name"
-                              , width = El.fill
-                              , view = .name >> Name.toString >> El.text
-                              }
-                            , { header = El.text "Id Number"
-                              , width = El.fill
-                              , view = .id >> String.fromInt >> El.text
-                              }
-                            , { header = El.text "Email"
-                              , width = El.fill
-                              , view = .email >> El.text
-                              }
-                            ]
+    case model of
+        Students students ->
+            El.table []
+                { data = students
+                , columns =
+                    [ { header = El.text "Name"
+                        , width = El.fill
+                        , view = .name >> Name.toString >> El.text
                         }
+                    , { header = El.text "Id Number"
+                        , width = El.fill
+                        , view = .id >> String.fromInt >> El.text
+                        }
+                    , { header = El.text "Email"
+                        , width = El.fill
+                        , view = .email >> El.text
+                        }
+                    ]
+                }
 
-                Loading ->
-                    El.el [Font.size 128] <| El.text "Loading..."
+        Loading ->
+            El.el [Font.size 128] <| El.text "Loading..."
 
-                Error msg ->
-                    El.el [] <| El.text msg
+        Error msg ->
+            El.el [] <| El.text msg
 
 -- INIT
 init : Model
