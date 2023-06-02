@@ -9,6 +9,13 @@ import Types.Event as Event exposing (Event)
 import Types.WeeklyEvent as WE exposing (WeeklyEvent)
 
 
+-- Class object, consisting of:
+-- subject: representing the name of the class, e.g. "MTH 231"
+-- crn: the course registration number
+-- credits: how many credits the class is
+-- sessions: a list of weekly meeting times
+-- midterms: a list of events
+-- final: either a single event (Just Event) or Nothing
 type alias Class =
     {   subject : String
     ,   crn : Int

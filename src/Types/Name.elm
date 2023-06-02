@@ -8,6 +8,7 @@ module Types.Name exposing
 import Json.Decode as D exposing (Decoder)
 
 
+-- Name 
 type alias Name = 
     {   first : String
     ,   last : String

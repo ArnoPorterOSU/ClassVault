@@ -22,6 +22,7 @@ type alias Student =
     }
 
 
+-- JSON decoder for a student
 decode : Decoder Student
 decode =
     D.map6 Student
