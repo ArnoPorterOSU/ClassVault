@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+
 import Browser
 import Browser.Navigation as Nav
 import Element as El exposing (Element, Color)
@@ -7,8 +8,12 @@ import Element.Region as Reg
 import Element.Background as Bg
 import Element.Font as Font
 import Json.Decode as D exposing (Value, Decoder)
+import Page.Home as Home
+import Route
 import Url exposing (Url)
 import Util exposing (uncurry)
+import Platform.Cmd as Cmd
+import Platform.Cmd as Cmd
 
 
 -- MODEL
@@ -17,12 +22,19 @@ type alias Model =
     , url : Url
     , width : Int
     , height : Int
+    , page : Page
     }
+
+
+type Page
+    = Home Home.Model
+
 
 -- UPDATE
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url
+    | GotHomeMsg Home.Msg
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -39,9 +51,28 @@ update msg model =
             )
 
         UrlChanged url ->
-            ( { model | url = url }
-            , Cmd.none
-            )
+            case Route.fromUrl url of
+                Just route ->
+                    case route of
+                        Route.Home ->
+                            ( { model
+                              | url = url
+                              , page = Home Home.init
+                              }
+                            , Cmd.map GotHomeMsg Home.getStudents
+                            )
+
+                _ -> (model, Cmd.none)
+
+        GotHomeMsg hmsg ->
+            let
+                Home homeModel = model.page
+            in
+                ( { model
+                  | page = Home <| Home.update hmsg homeModel
+                  }
+                , Cmd.none
+                )
 
 
 -- SUBSCRIPTIONS
@@ -71,7 +102,7 @@ navButton labelText =
         , El.padding standardPadding
         ]
         { url = labelText
-            |> String.uncons
+            |> (\x -> if x == "Home" then Nothing else String.uncons x)
             >> Maybe.map
                 (Tuple.mapFirst Char.toLower
                 >> uncurry String.cons
@@ -131,8 +162,9 @@ init flags url navKey =
           , height = decodedFlags.height
           , url = url
           , key = navKey
+          , page = Home Home.init
           }
-        , Cmd.none
+        , Cmd.map GotHomeMsg Home.getStudents
         )
 
 
