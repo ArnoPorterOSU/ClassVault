@@ -66,7 +66,7 @@ update msg model =
 
         GotHomeMsg hmsg ->
             let
-                Home homeModel = model.page
+                (Home homeModel) = model.page
             in
                 ( { model
                   | page = Home <| Home.update hmsg homeModel
