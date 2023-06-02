@@ -3,13 +3,16 @@ module Types.WeeklyEvent exposing
     ,   decode
     )
 
+
 import Json.Decode as D exposing (Decoder)
 import Types.Event exposing (Event)
+
 
 type alias WeeklyEvent =
     {   event : Event
     ,   repetitions : Maybe Int
     }
+
 
 decode : Decoder WeeklyEvent
 decode =

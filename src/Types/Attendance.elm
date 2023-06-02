@@ -3,8 +3,10 @@ module Types.Attendance exposing
     ,   decode
     )
 
+
 import Json.Decode as D exposing (Decoder)
 import Time
+
 
 type alias Attendance =
     {   date : Time.Posix
@@ -12,9 +14,10 @@ type alias Attendance =
     ,   comment : String
     }
 
+
 decode : Decoder Attendance
 decode =
     D.map3 Attendance
         (D.map Time.millisToPosix <| D.field "date" int)
-        (field "present" D.bool)
-        (field "comment" D.string)
+        (D.field "present" D.bool)
+        (D.field "comment" D.string)

@@ -3,8 +3,10 @@ module Types.Event exposing
     ,   decode
     )
 
+
 import Json.Decode as D exposing (Decoder)
 import Time
+
 
 type alias Event =
     {   when : Time.Posix
@@ -12,6 +14,7 @@ type alias Event =
     ,   where : String
     ,   duration : Float
     }
+
 
 decode : Decoder Event
 decode =

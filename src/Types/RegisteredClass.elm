@@ -3,9 +3,11 @@ module Types.RegisteredClass exposing
     ,   decode
     )
 
+
 import Json.Decode as D exposing (Decoder)
 import Types.Class as Class exposing (Class)
 import Types.Attendance as Attendance exposing (Attendance)
+
 
 type alias RegisteredClass =
     {   class : Class

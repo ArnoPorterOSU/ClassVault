@@ -3,9 +3,11 @@ module Types.Class exposing
     ,   decode
     )
 
+
 import Json.Decode as D exposing (Decoder)
 import Types.Event as Event exposing (Event)
 import Types.WeeklyEvent as WE exposing (WeeklyEvent)
+
 
 type alias Class =
     {   subject : String
@@ -15,6 +17,7 @@ type alias Class =
     ,   midterms: List Event
     ,   final : Maybe Event
     }
+
 
 decode : Decoder Class
 decode =

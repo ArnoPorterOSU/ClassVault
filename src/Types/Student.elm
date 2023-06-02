@@ -3,6 +3,7 @@ module Types.Student exposing
     ,   decode
     )
 
+
 import Dict exposing (Dict)
 import Json.Decode as D exposing (Decoder)
 import Types.Name as Name exposing (Name)
@@ -19,6 +20,7 @@ type alias Student =
     ,   address : Address
     ,   classes : Dict String RegisteredClass
     }
+
 
 decode : Decoder Student
 decode =
