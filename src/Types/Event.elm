@@ -1,7 +1,7 @@
 module Types.Event exposing
-    (   Event
-    ,   decode
-    ,   encode
+    ( Event
+    , decode
+    , encode
     )
 
 
@@ -21,10 +21,10 @@ type alias Milliseconds =
 -- where: the event's location
 -- duration: how long the event lasts, in milliseconds as a Float
 type alias Event =
-    {   when : Time.Posix
-    ,   what : String
-    ,   where : String
-    ,   duration : Milliseconds
+    { when : Time.Posix
+    , what : String
+    , where : String
+    , duration : Milliseconds
     }
 
 
@@ -32,10 +32,10 @@ type alias Event =
 encode : Event -> Value
 encode event =
     E.object
-        [   ("when", E.int <| Time.posixToMillis event.when)
-        ,   ("what", E.string event.what)
-        ,   ("where", E.string event.where)
-        ,   ("duration", E.float event.duration)
+        [ ("when", E.int <| Time.posixToMillis event.when)
+        , ("what", E.string event.what)
+        , ("where", E.string event.where)
+        , ("duration", E.float event.duration)
         ]
 
 

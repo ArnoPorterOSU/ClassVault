@@ -1,7 +1,7 @@
 module Types.WeeklyEvent exposing
-    (   WeeklyEvent
-    ,   decode
-    ,   encode
+    ( WeeklyEvent
+    , decode
+    , encode
     )
 
 
@@ -15,8 +15,8 @@ import Types.Event as Event exposing (Event)
 -- repetitions: If Nothing, represents a WeeklyEvent that should repeat indefinitely
 --      if Just x, represents an event that shall repeat x times.
 type alias WeeklyEvent =
-    {   event : Event
-    ,   repetitions : Maybe Int
+    { event : Event
+    , repetitions : Maybe Int
     }
 
 

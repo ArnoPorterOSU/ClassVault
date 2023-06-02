@@ -1,8 +1,8 @@
 module Types.Address exposing
-    (   Address
-    ,   toString
-    ,   decode
-    ,   encode
+    ( Address
+    , toString
+    , decode
+    , encode
     )
 
 
@@ -12,10 +12,10 @@ import Json.Encode as E exposing (Value)
 
 -- The Address datatype
 type alias Address =
-    {   street : String
-    ,   city : String
-    ,   state : String
-    ,   zipCode : Int
+    { street : String
+    , city : String
+    , state : String
+    , zipCode : Int
     }
 
 
@@ -29,10 +29,10 @@ toString addr =
 encode : Address -> Value
 encode addr =
     E.object
-        [   ("street", E.string addr.street)
-        ,   ("city", E.string addr.city)
-        ,   ("state", E.string addr.state)
-        ,   ("zipCode", E.int addr.zipCode)
+        [ ("street", E.string addr.street)
+        , ("city", E.string addr.city)
+        , ("state", E.string addr.state)
+        , ("zipCode", E.int addr.zipCode)
         ]
 
 

@@ -13,10 +13,10 @@ import Util exposing (uncurry)
 
 -- MODEL
 type alias Model =
-    {   key : Nav.Key 
-    ,   url : Url
-    ,   width : Int
-    ,   height : Int
+    { key : Nav.Key 
+    , url : Url
+    , width : Int
+    , height : Int
     }
 
 -- UPDATE
@@ -29,18 +29,18 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         LinkClicked urlRequest ->
-            (   model
-            ,   case urlRequest of
-                    Browser.Internal url ->
-                        Nav.pushUrl model.key <| Url.toString url
+            ( model
+            , case urlRequest of
+                Browser.Internal url ->
+                    Nav.pushUrl model.key <| Url.toString url
                         
-                    Browser.External href ->
-                        Nav.load href
+                Browser.External href ->
+                    Nav.load href
             )
 
         UrlChanged url ->
-            (   { model | url = url }
-            ,   Cmd.none
+            ( { model | url = url }
+            , Cmd.none
             )
 
 
@@ -98,18 +98,19 @@ white =
 
 view : Model -> Browser.Document Msg
 view model =
-    {   title = "ClassVault"
-    ,   body =  [ El.layout [] <| El.row
-                    [ El.width <| El.px model.width
-                    , El.spacing standardSpacing
-                    , Reg.navigation
-                    , Bg.color navColor
-                    ]
-                    [ navButton "Home"
-                    , navButton "Stats"
-                    , navButton "Calendar"
-                    ]
-                ]
+    { title = "ClassVault"
+    , body =
+        [ El.layout [] <| El.row
+            [ El.width <| El.px model.width
+            , El.spacing standardSpacing
+            , Reg.navigation
+            , Bg.color navColor
+            ]
+            [ navButton "Home"
+            , navButton "Stats"
+            , navButton "Calendar"
+            ]
+        ]
     }
 
 
@@ -122,22 +123,22 @@ init flags url navKey =
                 fs
 
             Err _ ->
-                {   width = 1920
-                ,   height = 1080
+                { width = 1920
+                , height = 955
                 }
     in
-        (   {   width = decodedFlags.width
-            ,   height = decodedFlags.height
-            ,   url = url
-            ,   key = navKey
-            }
-        ,   Cmd.none
+        ( { width = decodedFlags.width
+          , height = decodedFlags.height
+          , url = url
+          , key = navKey
+          }
+        , Cmd.none
         )
 
 
 type alias Flags =
-    {   width : Int
-    ,   height : Int
+    { width : Int
+    , height : Int
     }
 
     
@@ -152,10 +153,10 @@ decode =
 main : Program Value Model Msg
 main =
     Browser.application
-        {   init = init
-        ,   view = view
-        ,   update = update
-        ,   subscriptions = subscriptions
-        ,   onUrlChange = UrlChanged
-        ,   onUrlRequest = LinkClicked
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        , onUrlChange = UrlChanged
+        , onUrlRequest = LinkClicked
         }

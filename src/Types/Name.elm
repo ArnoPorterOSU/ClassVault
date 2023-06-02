@@ -1,8 +1,8 @@
 module Types.Name exposing
-    (   Name
-    ,   toString
-    ,   decode
-    ,   encode
+    ( Name
+    , toString
+    , decode
+    , encode
     )
 
 
@@ -15,9 +15,9 @@ import Json.Decode as D exposing (Decoder)
 -- last: A last name
 -- middles: A list of middle names; potentially empty
 type alias Name = 
-    {   first : String
-    ,   last : String
-    ,   middles : List String
+    { first : String
+    , last : String
+    , middles : List String
     }
 
 
@@ -31,9 +31,9 @@ toString name =
 encode : Name -> Value
 encode name =
     E.object
-        [   ("first", E.string name.first)
-        ,   ("last", E.string name.last)
-        ,   ("middles", E.list E.string name.middles)
+        [ ("first", E.string name.first)
+        , ("last", E.string name.last)
+        , ("middles", E.list E.string name.middles)
         ]
 
 

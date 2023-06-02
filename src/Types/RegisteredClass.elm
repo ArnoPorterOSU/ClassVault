@@ -1,7 +1,7 @@
 module Types.RegisteredClass exposing
-    (   RegisteredClass
-    ,   decode
-    ,   encode
+    ( RegisteredClass
+    , decode
+    , encode
     )
 
 
@@ -16,9 +16,9 @@ import Types.Attendance as Attendance exposing (Attendance)
 -- grade: A Float representing the grade in the class
 -- attendance: A list of Attendance records
 type alias RegisteredClass =
-    {   class : Class
-    ,   grade : Float
-    ,   attendance : List Attendance
+    { class : Class
+    , grade : Float
+    , attendance : List Attendance
     }
 
 
@@ -26,9 +26,9 @@ type alias RegisteredClass =
 encode : RegisteredClass -> Value
 encode registeredClass =
     E.object
-        [   ("class", Class.encode registeredClass.class)
-        ,   ("grade", E.float registeredClass.grade)
-        ,   ("attendance", E.list Attendance.encode registeredClass.attendance)
+        [ ("class", Class.encode registeredClass.class)
+        , ("grade", E.float registeredClass.grade)
+        , ("attendance", E.list Attendance.encode registeredClass.attendance)
         ]
 
 

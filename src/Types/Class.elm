@@ -1,7 +1,7 @@
 module Types.Class exposing
-    (   Class
-    ,   decode
-    ,   encode
+    ( Class
+    , decode
+    , encode
     )
 
 
@@ -19,12 +19,12 @@ import Types.WeeklyEvent as WE exposing (WeeklyEvent)
 -- midterms: a list of events
 -- final: either a single event (Just Event) or Nothing
 type alias Class =
-    {   subject : String
-    ,   crn : Int
-    ,   credits : Int
-    ,   sessions : List WeeklyEvent
-    ,   midterms: List Event
-    ,   final : Maybe Event
+    { subject : String
+    , crn : Int
+    , credits : Int
+    , sessions : List WeeklyEvent
+    , midterms: List Event
+    , final : Maybe Event
     }
 
 
@@ -32,11 +32,11 @@ type alias Class =
 encode : Class -> Value
 encode class =
     E.object <|
-        [   ("subject", E.string class.subject)
-        ,   ("crn", E.int class.crn)
-        ,   ("credits", E.int class.credits)
-        ,   ("sessions", E.list WE.encode class.sessions)
-        ,   ("midterms", E.list Event.encode class.midterms)
+        [ ("subject", E.string class.subject)
+        , ("crn", E.int class.crn)
+        , ("credits", E.int class.credits)
+        , ("sessions", E.list WE.encode class.sessions)
+        , ("midterms", E.list Event.encode class.midterms)
         ]
         ++
         case class.final of

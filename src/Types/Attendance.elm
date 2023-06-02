@@ -1,7 +1,7 @@
 module Types.Attendance exposing
-    (   Attendance
-    ,   decode
-    ,   encode
+    ( Attendance
+    , decode
+    , encode
     )
 
 
@@ -15,9 +15,9 @@ import Time
 -- present: whether or not the student was present
 -- comment: comments on the student's behavior
 type alias Attendance =
-    {   date : Time.Posix
-    ,   present : Bool
-    ,   comment : String
+    { date : Time.Posix
+    , present : Bool
+    , comment : String
     }
 
 
@@ -25,9 +25,9 @@ type alias Attendance =
 encode : Attendance -> Value
 encode attendance =
     E.object
-        [   ("date", E.int <| Time.posixToMillis attendance.date)
-            ("present", E.bool attendance.present)
-            ("comment", E.string attendance.comment)
+        [ ("date", E.int <| Time.posixToMillis attendance.date)
+        , ("present", E.bool attendance.present)
+        , ("comment", E.string attendance.comment)
         ]
 
 

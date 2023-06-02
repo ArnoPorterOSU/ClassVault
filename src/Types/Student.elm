@@ -1,7 +1,7 @@
 module Types.Student exposing
-    (   Student
-    ,   decode
-    ,   encode
+    ( Student
+    , decode
+    , encode
     )
 
 
@@ -21,12 +21,12 @@ import Types.RegisteredClass as RC exposing (RegisteredClass)
 -- address: The student's address, as an Address record
 -- classes: A dictionary keyed by class names, representing the student's registered classes
 type alias Student =
-    {   name : Name
-    ,   id : Int
-    ,   email : String
-    ,   gpa : Float
-    ,   address : Address
-    ,   classes : Dict String RegisteredClass
+    { name : Name
+    , id : Int
+    , email : String
+    , gpa : Float
+    , address : Address
+    , classes : Dict String RegisteredClass
     }
 
 
@@ -34,12 +34,12 @@ type alias Student =
 encode : Student -> Value
 encode student =
     E.object
-        [   ("name", Name.encode student.name)
-        ,   ("id", E.int student.id)
-        ,   ("email", E.string student.email)
-        ,   ("gpa", E.float student.gpa)
-        ,   ("address", Address.encode student.address)
-        ,   ("classes", E.dict identity RC.encode student.classes)
+        [ ("name", Name.encode student.name)
+        , ("id", E.int student.id)
+        , ("email", E.string student.email)
+        , ("gpa", E.float student.gpa)
+        , ("address", Address.encode student.address)
+        , ("classes", E.dict identity RC.encode student.classes)
         ]
 
 -- JSON decoder for a student
