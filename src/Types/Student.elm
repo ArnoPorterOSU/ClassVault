@@ -1,11 +1,13 @@
 module Types.Student exposing
     (   Student
     ,   decode
+    ,   encode
     )
 
 
 import Dict exposing (Dict)
 import Json.Decode as D exposing (Decoder)
+import Json.Encode as E exposing (Value)
 import Types.Name as Name exposing (Name)
 import Types.Address as Address exposing (Address)
 import Types.RegisteredClass as RC exposing (RegisteredClass)
@@ -27,6 +29,18 @@ type alias Student =
     ,   classes : Dict String RegisteredClass
     }
 
+
+-- JSON encoder for a student
+encode : Student -> Value
+encode student =
+    E.object
+        [   ("name", Name.encode student.name)
+        ,   ("id", E.int student.id)
+        ,   ("email", E.string student.email)
+        ,   ("gpa", E.float student.gpa)
+        ,   ("address", Address.encode student.address)
+        ,   ("classes", E.dict identity RC.encode student.classes)
+        ]
 
 -- JSON decoder for a student
 decode : Decoder Student

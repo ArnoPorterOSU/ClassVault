@@ -1,10 +1,12 @@
 module Types.Attendance exposing
     (   Attendance
     ,   decode
+    ,   encode
     )
 
 
 import Json.Decode as D exposing (Decoder)
+import Json.Encode as E exposing (Value)
 import Time
 
 
@@ -17,6 +19,16 @@ type alias Attendance =
     ,   present : Bool
     ,   comment : String
     }
+
+
+-- JSON encoder for an Attendance object
+encode : Attendance -> Value
+encode attendance =
+    E.object
+        [   ("date", E.int <| Time.posixToMillis attendance.date)
+            ("present", E.bool attendance.present)
+            ("comment", E.string attendance.comment)
+        ]
 
 
 -- JSON decoder for an Attendance object

@@ -1,10 +1,12 @@
 module Types.Event exposing
     (   Event
     ,   decode
+    ,   encode
     )
 
 
 import Json.Decode as D exposing (Decoder)
+import Json.Encode as E exposing (Value)
 import Time
 
 
@@ -24,6 +26,17 @@ type alias Event =
     ,   where : String
     ,   duration : Milliseconds
     }
+
+
+-- JSON encoder for the Event class
+encode : Event -> Value
+encode event =
+    E.object
+        [   ("when", E.int <| Time.posixToMillis event.when)
+        ,   ("what", E.string event.what)
+        ,   ("where", E.string event.where)
+        ,   ("duration", E.float event.duration)
+        ]
 
 
 -- JSON decoder for the Event class

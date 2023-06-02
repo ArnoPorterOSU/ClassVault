@@ -1,11 +1,13 @@
 module Types.WeeklyEvent exposing
     (   WeeklyEvent
     ,   decode
+    ,   encode
     )
 
 
 import Json.Decode as D exposing (Decoder)
-import Types.Event exposing (Event)
+import Json.Encode as E exposing (Value)
+import Types.Event as Event exposing (Event)
 
 
 -- WeeklyEvent record, consisting of
@@ -16,6 +18,20 @@ type alias WeeklyEvent =
     {   event : Event
     ,   repetitions : Maybe Int
     }
+
+
+-- JSON encoder for a WeeklyEvent object
+encode : WeeklyEvent -> Value
+encode weeklyEvent =
+    E.object <|
+        ("event", Event.encode weeklyEvent.event)
+        ::
+        case weeklyEvent.repetitions of
+            Just repetitions ->
+                [("repetitions", E.int repetitions)]
+
+            _ ->
+                []
 
 
 -- JSON decoder for a WeeklyEvent object

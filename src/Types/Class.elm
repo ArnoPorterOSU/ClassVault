@@ -1,10 +1,12 @@
 module Types.Class exposing
     (   Class
     ,   decode
+    ,   encode
     )
 
 
 import Json.Decode as D exposing (Decoder)
+import Json.Encode as E exposing (Value)
 import Types.Event as Event exposing (Event)
 import Types.WeeklyEvent as WE exposing (WeeklyEvent)
 
@@ -26,6 +28,24 @@ type alias Class =
     }
 
 
+-- JSON encoder for a Class object
+encode : Class -> Value
+encode class =
+    E.object <|
+        [   ("subject", E.string class.subject)
+        ,   ("crn", E.int class.crn)
+        ,   ("credits", E.int class.credits)
+        ,   ("sessions", E.list WE.encode class.sessions)
+        ,   ("midterms", E.list Event.encode class.midterms)
+        ]
+        ++
+        case class.final of
+            Just final ->
+                [("final", Event.encode final)]
+
+            _ ->
+                []
+                
 -- JSON decoder for a Class object
 decode : Decoder Class
 decode =

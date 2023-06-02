@@ -2,10 +2,12 @@ module Types.Address exposing
     (   Address
     ,   toString
     ,   decode
+    ,   encode
     )
 
 
 import Json.Decode as D exposing (Decoder)
+import Json.Encode as E exposing (Value)
 
 
 -- The Address datatype
@@ -23,7 +25,18 @@ toString addr =
     addr.street ++ " " addr.city ++ ", " ++ addr.state ++ " " ++ String.fromInt addr.zipCode
 
 
--- Decodes an Address
+-- Encodes an Address into JSON
+encode : Address -> Value
+encode addr =
+    E.object
+        [   ("street", E.string addr.street)
+        ,   ("city", E.string addr.city)
+        ,   ("state", E.string addr.state)
+        ,   ("zipCode", E.int addr.zipCode)
+        ]
+
+
+-- Decodes an Address from JSON
 decode : Decoder Address
 decode =
     D.map4 Address

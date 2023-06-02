@@ -1,10 +1,12 @@
 module Types.RegisteredClass exposing
     (   RegisteredClass
     ,   decode
+    ,   encode
     )
 
 
 import Json.Decode as D exposing (Decoder)
+import Json.Encode as E exposing (Value)
 import Types.Class as Class exposing (Class)
 import Types.Attendance as Attendance exposing (Attendance)
 
@@ -20,10 +22,20 @@ type alias RegisteredClass =
     }
 
 
+-- JSON encoder for a RegisteredClass object
+encode : RegisteredClass -> Value
+encode registeredClass =
+    E.object
+        [   ("class", Class.encode registeredClass.class)
+        ,   ("grade", E.float registeredClass.grade)
+        ,   ("attendance", E.list Attendance.encode registeredClass.attendance)
+        ]
+
+
 -- JSON decoder for a RegisteredClass object
 decode : Decoder RegisteredClass
 decode =
     D.map3 RegisteredClass
         (D.field "class" Class.decode)
-        (D.field "grade" D.bool)
+        (D.field "grade" D.float)
         (D.field "attendance" <| D.list Attendance.decode)

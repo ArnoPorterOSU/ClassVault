@@ -2,9 +2,11 @@ module Types.Name exposing
     (   Name
     ,   toString
     ,   decode
+    ,   encode
     )
 
 
+import Json.Encode as E exposing (Value)
 import Json.Decode as D exposing (Decoder)
 
 
@@ -23,6 +25,16 @@ type alias Name =
 toString : Name -> String
 toString name =
     name.first ++ List.foldr (++) " " (List.map ((++) " ") name.middles) ++ name.last
+
+
+-- JSON Encoder
+encode : Name -> Value
+encode name =
+    E.object
+        [   ("first", E.string name.first)
+        ,   ("last", E.string name.last)
+        ,   ("middles", E.list E.string name.middles)
+        ]
 
 
 -- Decoder to decode a name from JSON
