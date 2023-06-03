@@ -1,5 +1,5 @@
 module Util exposing
-    (   uncurry
+    ( uncurry
     )
 
 
