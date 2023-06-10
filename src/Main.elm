@@ -7,19 +7,18 @@ import Element as El exposing (Element, Color)
 import Element.Region as Reg
 import Element.Background as Bg
 import Element.Font as Font
-import Html
 import Json.Decode as D exposing (Value, Decoder)
 import Page.Home as Home
 import Route
 import Url exposing (Url)
 import Util exposing (uncurry)
 import Platform.Cmd as Cmd
+import StyleVars exposing (..)
 
 
 -- MODEL
 type alias Model =
     { key : Nav.Key 
-    , url : Url
     , width : Int
     , height : Int
     , page : Page
@@ -56,8 +55,7 @@ update msg model =
                     case route of
                         Route.Home ->
                             ( { model
-                              | url = url
-                              , page = Home Home.init
+                              | page = Home Home.init
                               }
                             , Cmd.map GotHomeMsg Home.getStudents
                             )
@@ -82,16 +80,6 @@ subscriptions =
 
 
 -- VIEW
-standardPadding : Int
-standardPadding =
-    10
-
-
-standardSpacing : Int
-standardSpacing =
-    5
-
-
 navButton : String -> Element Msg
 navButton labelText =
     El.link
@@ -122,16 +110,13 @@ navMouseOverColor =
     El.rgb255 30 96 138
 
 
-white : Color
-white =
-    El.rgb255 255 255 255
-
-
 view : Model -> Browser.Document Msg
 view model =
     { title = "ClassVault"
     , body =
-        [ El.layout [] <| El.column []
+        [ El.layout [] <| El.column
+            [ El.spacing standardSpacing
+            ]
             [ El.row
                 [ El.width <| El.px model.width
                 , El.spacing standardSpacing
@@ -152,7 +137,7 @@ view model =
 
 -- INIT
 init : Value -> Url -> Nav.Key -> (Model, Cmd Msg)
-init flags url navKey =
+init flags _ navKey =
     let
         decodedFlags = case D.decodeValue decode flags of
             Ok fs ->
@@ -165,7 +150,6 @@ init flags url navKey =
     in
         ( { width = decodedFlags.width
           , height = decodedFlags.height
-          , url = url
           , key = navKey
           , page = Home Home.init
           }
