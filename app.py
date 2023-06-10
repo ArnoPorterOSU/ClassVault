@@ -1,7 +1,4 @@
-from dotenv import load_dotenv
-from flask import Flask, url_for, request
-
-load_dotenv()
+from flask import Flask, url_for, request, jsonify
 
 app = Flask(__name__)
 
@@ -34,7 +31,7 @@ def create():
 
 @app.route('/read')
 def read():
-    return [
+    return jsonify([
         { "name": (
             { "first": "Evan"
             , "last": "Hock"
@@ -48,7 +45,6 @@ def read():
             , "zipCode": 97330
             , "street": "804 NE 2nd St"
             })
-        , "classes": {}
         },
         { "name": (
             { "first": "Leeroy"
@@ -63,7 +59,6 @@ def read():
             , "zipCode": 96203
             , "street": "2901 SE Division St"
             })
-        , "classes": {}
         },
         { "name": (
             { "first": "Bob"
@@ -78,9 +73,8 @@ def read():
             , "city": "Corvallis"
             , "zipCode": 97330
             })
-        , "classes": {}
         }
-    ]
+    ])
 
 
 @app.route('/raf')

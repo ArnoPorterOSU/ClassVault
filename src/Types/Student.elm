@@ -5,12 +5,10 @@ module Types.Student exposing
     )
 
 
-import Dict exposing (Dict)
 import Json.Decode as D exposing (Decoder)
 import Json.Encode as E exposing (Value)
 import Types.Name as Name exposing (Name)
 import Types.Address as Address exposing (Address)
-import Types.RegisteredClass as RC exposing (RegisteredClass)
 
 
 -- The Student datatype, consisting of the following fields:
@@ -26,7 +24,6 @@ type alias Student =
     , email : String
     , gpa : Float
     , address : Address
-    , classes : Dict String RegisteredClass
     }
 
 
@@ -39,16 +36,14 @@ encode student =
         , ("email", E.string student.email)
         , ("gpa", E.float student.gpa)
         , ("address", Address.encode student.address)
-        , ("classes", E.dict identity RC.encode student.classes)
         ]
 
 -- JSON decoder for a student
 decode : Decoder Student
 decode =
-    D.map6 Student
+    D.map5 Student
         (D.field "name" Name.decode)
         (D.field "id" D.int)
         (D.field "email" D.string)
         (D.field "gpa" D.float)
         (D.field "address" Address.decode)
-        (D.field "classes" <| D.dict RC.decode)
