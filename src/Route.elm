@@ -15,9 +15,6 @@ type Route
     = Home
     -- | Calendar
     -- | Stats
-    -- | Login
-    -- | Logout
-    -- | Register
 
 
 parser : Parser (Route -> a) a
@@ -26,9 +23,6 @@ parser =
         [ Parser.map Home Parser.top
     --    , Parser.map Calendar <| Parser.s "calendar"
     --    , Parser.map Stats <| Parser.s "stats"
-    --    , Parser.map Login <| Parser.s "login"
-    --    , Parser.map Logout <| Parser.s "logout"
-    --    , Parser.map Register <| Parser.s "register"
         ]
 
     
@@ -56,13 +50,4 @@ routeToString page =
         
         Stats ->
             "stats"
-
-        Login ->
-            "login"
-        
-        Logout ->
-            "logout"
-        
-        Register ->
-            "register"
     -}
