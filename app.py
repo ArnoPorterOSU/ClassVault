@@ -34,8 +34,53 @@ def create():
 
 @app.route('/read')
 def read():
-    # read an entry from the database based on request data
-    pass
+    return [
+        { "name": (
+            { "first": "Evan"
+            , "last": "Hock"
+            })
+        , "id": 1337
+        , "email": "hocke@oregonstate.edu"
+        , "gpa": 3.92
+        , "address": (
+            { "city": "Corvallis"
+            , "state": "Oregon"
+            , "zipCode": 97330
+            , "street": "804 NE 2nd St"
+            })
+        , "classes": {}
+        },
+        { "name": (
+            { "first": "Leeroy"
+            , "last": "Jenkins"
+            })
+        , "id": 5762034481
+        , "gpa": 3.4
+        , "email": "leeroyjenkins@gmail.com"
+        , "address": (
+            { "city": "Portland"
+            , "state": "Oregon"
+            , "zipCode": 96203
+            , "street": "2901 SE Division St"
+            })
+        , "classes": {}
+        },
+        { "name": (
+            { "first": "Bob"
+            , "last": "Smith"
+            })
+        , "email": "bob.smith@gmail.com"
+        , "id": 439204234
+        , "gpa": 0.5
+        , "address": (
+            { "street": "905 Circle Blvd"
+            , "state": "Oregon"
+            , "city": "Corvallis"
+            , "zipCode": 97330
+            })
+        , "classes": {}
+        }
+    ]
 
 
 @app.route('/raf')

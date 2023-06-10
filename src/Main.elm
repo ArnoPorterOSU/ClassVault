@@ -3,7 +3,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
-import Element as El exposing (Element, Color)
+import Element as El exposing (Element)
 import Element.Region as Reg
 import Element.Background as Bg
 import Element.Font as Font
@@ -13,7 +13,7 @@ import Route
 import Url exposing (Url)
 import Util exposing (uncurry)
 import Platform.Cmd as Cmd
-import StyleVars exposing (..)
+import StyleVars
 
 
 -- MODEL
@@ -84,30 +84,21 @@ navButton : String -> Element Msg
 navButton labelText =
     El.link
         [ El.mouseOver
-            [ Bg.color navMouseOverColor
+            [ Bg.color StyleVars.interactibleMouseOverColor
             ]
-        , Font.color white
-        , El.padding standardPadding
+        , Font.color StyleVars.white
+        , El.padding StyleVars.standardPadding
         ]
         { url = labelText
             |> (\x -> if x == "Home" then Nothing else String.uncons x)
             >> Maybe.map
-                (Tuple.mapFirst Char.toLower
+                (  Tuple.mapFirst Char.toLower
                 >> uncurry String.cons
-                >> String.cons '/')
+                >> String.cons '/'
+                )
             >> Maybe.withDefault "/"
         , label = El.text labelText
         }
-
-
-navColor : Color
-navColor =
-    El.rgb255 95 171 220
-
-
-navMouseOverColor : Color
-navMouseOverColor =
-    El.rgb255 30 96 138
 
 
 view : Model -> Browser.Document Msg
@@ -115,13 +106,13 @@ view model =
     { title = "ClassVault"
     , body =
         [ El.layout [] <| El.column
-            [ El.spacing standardSpacing
+            [ El.spacing StyleVars.standardSpacing
             ]
             [ El.row
                 [ El.width <| El.px model.width
-                , El.spacing standardSpacing
+                , El.spacing StyleVars.standardSpacing
                 , Reg.navigation
-                , Bg.color navColor
+                , Bg.color StyleVars.interactibleColor
                 ]
                 [ navButton "Home"
                 , navButton "Stats"
