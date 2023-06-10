@@ -8,10 +8,8 @@ module Page.Home exposing
     )
 
 
-import Html exposing (Html)
 import Http
 import Element as El exposing (Element)
-import Element.Font as Font
 import Json.Decode as D
 import Types.Name as Name
 import Types.Student as Student exposing (Student)
@@ -67,7 +65,7 @@ view model =
                 }
 
         Loading ->
-            El.el [Font.size 128] <| El.text "Loading..."
+            El.el [] <| El.text "Loading..."
 
         Error msg ->
             El.el [] <| El.text msg
