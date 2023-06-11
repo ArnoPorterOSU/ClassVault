@@ -37,6 +37,13 @@ def main():
     with open('index.html', 'r') as f:
         return f.read()
 
+@app.route('midterm', methods=['GET', 'POST'])
+def midterm():
+    return '<img src="static/raf_midterm.png" />'
+
+@app.route('rafwalk', methods=['GET', 'POST'])
+def rafwalk():
+    return '<img src="static/raf_walk.png" />'
 
 @app.route('/create', methods=['GET', 'POST'])
 def create():
