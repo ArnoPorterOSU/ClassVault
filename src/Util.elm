@@ -2,7 +2,7 @@ module Util exposing
     ( uncurry
     , maybeToBool
     , inRange
-    , guard
+    , justWhen
     , flip
     , on
     , group
@@ -44,8 +44,8 @@ inRange low high x =
 
 
 -- returns Nothing if the predicate p fails
-guard : (a -> Bool) -> a -> Maybe a
-guard p x =
+justWhen : (a -> Bool) -> a -> Maybe a
+justWhen p x =
     if p x then
         Just x
     else
