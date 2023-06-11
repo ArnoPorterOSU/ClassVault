@@ -61,7 +61,7 @@ update msg model =
                     case route of
                         Route.Home ->
                             ( { model
-                              | page = Home <| Home.init model.data
+                              | page = Home <| Home.init { width = model.width, students = model.data }
                               }
                             , Cmd.none
                             )
@@ -85,7 +85,7 @@ update msg model =
                 Ok students ->
                     ( { model
                       | data = students
-                      , page = Home <| Home.init students
+                      , page = Home <| Home.init { width = model.width, students = students }
                       }
                     , Cmd.none
                     )

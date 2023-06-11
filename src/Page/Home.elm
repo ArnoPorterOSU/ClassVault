@@ -15,13 +15,15 @@ import Element.Font as Font
 import Types.Name as Name
 import Types.Student exposing (Student)
 import StyleVars
-import Util exposing (maybeToBool, inRange, guard)
+import Util exposing (maybeToBool, inRange, justWhen, flip)
+import Email
 
 
 -- MODEL
 type alias Model =
     { menu : Maybe Menu
     , data : List Student
+    , width : Int
     }
 
 
@@ -170,14 +172,14 @@ view model =
         [ Always <| Inp.button
             [ El.mouseOver [Bg.color StyleVars.interactibleMouseOverColor]
             , Bg.color StyleVars.interactibleColor
-            , Border.rounded 5
+            , Border.rounded buttonRounding
             , Font.color StyleVars.white
             , El.padding StyleVars.standardPadding
             ]
             { onPress = Just ToggleMenu 
             , label = El.text <| if maybeToBool model.menu then "Close Menu" else "Add Student" 
             }
-        , When (maybeToBool model.menu) <| addMenu
+        , When (maybeToBool model.menu) <| addMenu model.width model.data
             <| Maybe.withDefault defaultMenu model.menu
         , Always <| case model.data of
             [] ->
@@ -204,6 +206,16 @@ view model =
         ]
 
 
+entryRowFontSize : Int
+entryRowFontSize =
+    16
+
+
+buttonRounding : Int
+buttonRounding =
+    5
+
+
 -- a function that allows for generating student data entry rows
 entryRow :
     { onChange : (String -> Msg)
@@ -212,8 +224,7 @@ entryRow :
     , labelText : String
     , parser : String -> Maybe a
     , badMsg : String
-    }
-    -> Element Msg
+    } -> Element Msg
 entryRow
     { onChange
     , text
@@ -226,24 +237,26 @@ entryRow
         [ Always <| Inp.text []
             { onChange = onChange
             , text = text
-            , placeholder = Just <| Inp.placeholder [] <| El.text placeholderText
-            , label = Inp.labelAbove [Font.size 16] <| El.text labelText
+            , placeholder = Just <| Inp.placeholder [Font.size entryRowFontSize] <| El.text placeholderText
+            , label = Inp.labelAbove [Font.size entryRowFontSize] <| El.text labelText
             }
         , When (badCheck parser text) <|
             El.el
-                [ Bg.color <| El.rgb255 0xf4 0x84 0x7C
-                , Font.color <| El.rgb255 0xf4 0x64 0x7e
+                [ Bg.color <| El.rgba255 0xf9 0x3d 0x5c 0x80
+                , Font.color StyleVars.white
+                , Font.size entryRowFontSize
                 , El.padding StyleVars.standardPadding
-                , Border.rounded 5
+                , Border.rounded buttonRounding
                 ] <| El.text badMsg
         ]
 
 
-addMenu : Menu -> Element Msg
-addMenu menu =
+addMenu : Int -> List Student -> Menu -> Element Msg
+addMenu width students menu =
     El.column
         [ El.spacing StyleVars.standardSpacing
         , El.padding StyleVars.standardPadding
+        , El.width <| El.px width
         ]
         [ entryRow
             { onChange = NameUpdate
@@ -251,23 +264,64 @@ addMenu menu =
             , placeholderText = "First Last"
             , labelText = "Name"
             , parser = Name.fromString
-            , badMsg = "⚠  Name must contain at least first and last name"
+            , badMsg = "⚠ Must contain at least first and last name"
+            }
+        , entryRow
+            { onChange = EmailUpdate
+            , text = menu.email
+            , placeholderText = "name@example.com"
+            , labelText = "Email"
+            , parser = Email.fromString
+            , badMsg = "⚠ Must be a valid email"
             }
         , entryRow
             { onChange = IdUpdate
             , text = menu.id
             , placeholderText = "Id #"
             , labelText = "Id Number"
-            , parser = String.toInt
-            , badMsg = "⚠ Id must be a number that a student doesn't already have"
+            , parser = String.toInt >> Maybe.andThen (justWhen <| not << flip List.member (List.map .id students))
+            , badMsg = "⚠ Must be a number that a student doesn't already have"
             }
         , entryRow
             { onChange = GpaUpdate
             , text = menu.gpa
             , placeholderText = "GPA"
             , labelText = "GPA"
-            , parser = String.toFloat >> Maybe.andThen (guard <| inRange 0 4)
-            , badMsg = "⚠ GPA must be a float in the range 0-4"
+            , parser = String.toFloat >> Maybe.andThen (justWhen <| inRange 0 4)
+            , badMsg = "⚠ Must be a float in the range 0.0-4.0"
+            }
+        , El.text "Address info"
+        , entryRow
+            { onChange = StreetUpdate
+            , text = menu.street
+            , placeholderText = "1234 Example St"
+            , labelText = "Street"
+            , parser = Just
+            , badMsg = ""
+            }
+        , entryRow
+            { onChange = CityUpdate
+            , text = menu.city
+            , placeholderText = "Springville"
+            , labelText = "City"
+            , parser = Just
+            , badMsg = ""
+            }
+        , entryRow
+            { onChange = StateUpdate
+            , text = menu.state
+            , placeholderText = "Statington"
+            , labelText = "State"
+            , parser = Just
+            , badMsg = ""
+            }
+        , entryRow
+            { onChange = ZipUpdate
+            , text = menu.zip
+            , placeholderText = "12345"
+            , labelText = "Zip Code"
+            , parser = String.toInt
+            , badMsg = "⚠ Must be an integer"
             }
         ]
 
@@ -309,8 +363,15 @@ conditional =
 
         
 -- INIT
-init : List Student -> Model
-init students =
+init :
+    { width : Int
+    , students : List Student
+    } -> Model
+init
+    { width
+    , students
+    } =
     { menu = Nothing
     , data = students
+    , width = width
     }
