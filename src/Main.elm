@@ -4,15 +4,17 @@ module Main exposing (main)
 import Browser
 import Browser.Navigation as Nav
 import Element as El exposing (Element)
-import Element.Region as Reg
 import Element.Background as Bg
 import Element.Font as Font
+import Element.Region as Reg
+import Http
 import Json.Decode as D exposing (Value, Decoder)
 import Page.Home as Home
+import Platform.Cmd as Cmd
 import Route
 import Url exposing (Url)
 import Util exposing (uncurry)
-import Platform.Cmd as Cmd
+import Types.Student as Student exposing (Student)
 import StyleVars
 
 
@@ -22,11 +24,14 @@ type alias Model =
     , width : Int
     , height : Int
     , page : Page
+    , data : List Student
     }
 
 
 type Page
     = Home Home.Model
+    | Error String
+    | Loading
 
 
 -- UPDATE
@@ -34,6 +39,7 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url
     | GotHomeMsg Home.Msg
+    | GotStudents (Result Http.Error (List Student))
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -55,22 +61,42 @@ update msg model =
                     case route of
                         Route.Home ->
                             ( { model
-                              | page = Home Home.init
+                              | page = Home <| Home.init model.data
                               }
-                            , Cmd.map GotHomeMsg Home.getStudents
+                            , Cmd.none
                             )
 
                 _ -> (model, Cmd.none)
 
         GotHomeMsg hmsg ->
-            let
-                (Home homeModel) = model.page
-            in
-                ( { model
-                  | page = Home <| Home.update hmsg homeModel
-                  }
-                , Cmd.none
-                )
+            case model.page of
+                Home homeModel ->
+                    ( { model
+                      | page = Home <| Home.update hmsg homeModel
+                      }
+                    , Cmd.none
+                    )
+                
+                _ ->
+                    (model, Cmd.none)
+
+        GotStudents result ->
+            case result of
+                Ok students ->
+                    ( { model
+                      | data = students
+                      , page = Home <| Home.init students
+                      }
+                    , Cmd.none
+                    )
+
+                Err _ ->
+                    ( { model
+                      | data = []
+                      , page = Error "Something went wrong"
+                      }
+                    , Cmd.none
+                    )
 
 
 -- SUBSCRIPTIONS
@@ -121,6 +147,12 @@ view model =
             ,   case model.page of
                     Home hmodel ->
                         El.map GotHomeMsg <| Home.view hmodel
+
+                    Loading ->
+                        El.el [] <| El.text "Loading..."
+
+                    Error error ->
+                        El.el [] <| El.text error
             ]
         ]
     }
@@ -142,10 +174,19 @@ init flags _ navKey =
         ( { width = decodedFlags.width
           , height = decodedFlags.height
           , key = navKey
-          , page = Home Home.init
+          , page = Loading
+          , data = []
           }
-        , Cmd.map GotHomeMsg Home.getStudents
+        , getStudents
         )
+
+
+getStudents : Cmd Msg
+getStudents =
+    Http.get
+        { url = "/read"
+        , expect = Http.expectJson GotStudents <| D.list Student.decode
+        }
 
 
 type alias Flags =
