@@ -13,7 +13,7 @@ import Element.Border as Border
 import Element.Background as Bg
 import Element.Font as Font
 import Types.Name as Name
-import Types.Student as Student exposing (Student)
+import Types.Student exposing (Student)
 import StyleVars
 import Util exposing (maybeToBool, inRange, guard)
 
@@ -39,7 +39,6 @@ type alias Menu =
 
 -- MSG
 type Msg
-    --= GotStudents (Result Http.Error (List Student))
     = ToggleMenu
     | NameUpdate String
     | IdUpdate String
@@ -68,17 +67,6 @@ defaultMenu =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-    {-
-        GotStudents result ->
-            { model
-            | data = case result of
-                Ok students ->
-                    Students students
-                    
-                Err _ ->
-                    Error "Something went wrong"
-            }
-    -}
         ToggleMenu -> 
             { model
             | menu =
