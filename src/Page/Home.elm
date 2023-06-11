@@ -19,13 +19,15 @@ import Json.Decode as D
 import Types.Name as Name
 import Types.Student as Student exposing (Student)
 import StyleVars
+import Util exposing (maybeToBool)
 
 
 -- MODEL
 type alias Model =
-    { addingStudent : Bool
+    { menu : Maybe Menu
     , data : Data
     }
+
 
 type Data
     = Loading
@@ -33,13 +35,27 @@ type Data
     | Error String
 
 
+type alias Menu =
+    { name : String
+    , nameBad : Bool
+    }
+
+
 -- MSG
 type Msg
     = GotStudents (Result Http.Error (List Student))
     | ToggleMenu
+    | NameUpdate String
 
 
 -- UPDATE
+defaultMenu : Menu
+defaultMenu =
+    { name = ""
+    , nameBad = False
+    }
+
+
 update : Msg -> Model -> Model
 update msg model =
     case msg of
@@ -55,18 +71,85 @@ update msg model =
         
         ToggleMenu -> 
             { model
-            | addingStudent = not model.addingStudent
+            | menu =
+                case model.menu of
+                    Nothing ->
+                        Just defaultMenu
+
+                    _ ->
+                        Nothing
             }
 
+        NameUpdate name ->
+            { model
+            | menu =
+                Maybe.map (
+                    \menu ->
+                        { menu
+                        | name = name
+                        , nameBad = not <| (name |> Name.fromString >> maybeToBool) || String.isEmpty name
+                        }
+                    )
+                    model.menu
+            }
 
 -- VIEW
+addMenu : Menu -> Element Msg
+addMenu menu =
+    El.column
+        [ El.spacing StyleVars.standardSpacing
+        , El.padding StyleVars.standardPadding
+        ] <| conditional
+        [ Always <| Inp.text []
+            { onChange = NameUpdate
+            , text = menu.name
+            , placeholder = Just <| Inp.placeholder [] <| El.text "First Last"
+            , label = Inp.labelAbove [] <| El.text "Name"
+            }
+        , When menu.nameBad <|
+            El.el [] <| El.text "Must provide first and last name"
+        ]
+
+
+-- This allows for conditional rendering of elements easily
+type ConditionalElem msg
+    = When Bool (Element msg)
+    | Always (Element msg)
+
+
+-- Collapses conditionals in an element list, allowing for
+-- easy notation of lists of elements that may or may not be there
+conditional : List (ConditionalElem msg) -> List (Element msg)
+conditional =
+    List.filter
+        (\elem ->
+            case elem of
+                Always _ ->
+                    True
+
+                When p _ ->
+                    p
+        )
+    >>
+    List.map
+        (\elem ->
+            case elem of
+                Always e ->
+                    e
+
+                When _ e ->
+                    e
+        )
+
+
 view : Model -> Element Msg
 view model =
     El.column
         [ El.width El.fill
         , El.padding StyleVars.standardPadding
-        ] <|
-        Inp.button
+        , El.spacing StyleVars.standardSpacing
+        ] <| conditional
+        [ Always <| Inp.button
             [ El.mouseOver [Bg.color StyleVars.interactibleMouseOverColor]
             , Bg.color StyleVars.interactibleColor
             , Border.rounded 5
@@ -74,12 +157,10 @@ view model =
             , El.padding StyleVars.standardPadding
             ]
             { onPress = Just ToggleMenu 
-            , label = El.text <| if model.addingStudent then "Close Menu" else "Add Student" 
+            , label = El.text <| if maybeToBool model.menu then "Close Menu" else "Add Student" 
             }
-        ::
-        (if model.addingStudent then [El.el [] <| El.text "Placeholder"] else [])
-        ++
-        [ case model.data of
+        , When (maybeToBool model.menu) <| addMenu <| Maybe.withDefault defaultMenu model.menu
+        , Always <| case model.data of
             Students students ->
                 case students of
                     [] ->
@@ -114,7 +195,7 @@ view model =
 -- INIT
 init : Model
 init =
-    { addingStudent = False
+    { menu = Nothing
     , data = Loading
     }
 

@@ -1,6 +1,7 @@
 module Types.Name exposing
     ( Name
     , toString
+    , fromString
     , decode
     , encode
     )
@@ -25,6 +26,30 @@ type alias Name =
 toString : Name -> String
 toString name =
     name.first ++ List.foldr (++) " " (List.map ((++) " ") name.middles) ++ name.last
+
+
+-- Converts a string into a name
+fromString : String -> Maybe Name
+fromString nameString =
+    let
+        nameData = nameString |> String.split " " >> List.map String.trim >> List.filter (String.length >> (<) 0)
+        nameLen = List.length nameData
+    in
+        if nameLen < 2 then
+            Nothing
+        else
+            let
+                first = nameData |> List.head >> Maybe.withDefault ""
+                last = nameData |> List.drop (nameLen - 1) >> List.head >> Maybe.withDefault ""
+                middles = nameData |> List.take (nameLen - 1) >> List.drop 1
+            in
+                Just
+                    { first = first
+                    , last = last
+                    , middles = middles
+                    }
+        
+
 
 
 -- JSON Encoder
