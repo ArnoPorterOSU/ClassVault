@@ -112,17 +112,20 @@ update msg model =
         StudentCreated result ->
             case result of
                 Ok student ->
-                    ( { model
-                      | data = student :: model.data
-                      , page = case model.page of
-                            Home hmodel ->
-                                Home <| Home.update (Home.StudentCreated student) hmodel
+                    let
+                        newStudents = student :: model.data
+                    in
+                        ( { model
+                        | data = newStudents
+                        , page = case model.page of
+                                Home hmodel ->
+                                    Home <| Home.update (Home.ListUpdated newStudents) hmodel
 
-                            _ ->
-                                model.page
-                      }
-                    , Cmd.none
-                    )
+                                _ ->
+                                    model.page
+                        }
+                        , Cmd.none
+                        )
                 
                 Err _ ->
                     (model, Cmd.none)
@@ -130,17 +133,20 @@ update msg model =
         StudentDeleted result ->
             case result of
                 Ok idList ->
-                    ( { model
-                      | data = List.filter (.id >> flip List.member idList >> not) model.data
-                      , page = case model.page of
-                        Home hmodel ->
-                            Home <| Home.update (Home.StudentDeleted idList) hmodel
-                        
-                        _ ->
-                            model.page
-                      }
-                    , Cmd.none
-                    )
+                    let
+                        newStudents = List.filter (.id >> flip List.member idList >> not) model.data
+                    in
+                        ( { model
+                          | data = newStudents
+                          , page = case model.page of
+                                Home hmodel ->
+                                    Home <| Home.update (Home.ListUpdated newStudents) hmodel
+                            
+                                _ ->
+                                    model.page
+                          }
+                        , Cmd.none
+                        )
 
                 Err _ ->
                     (model, Cmd.none)

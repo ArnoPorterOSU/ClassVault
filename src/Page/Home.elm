@@ -53,11 +53,10 @@ type Msg
     | StateUpdate String
     | ZipUpdate String
     | SubmitStudent Value
-    | StudentCreated Student
     | OpenEdit Student
     | EditStudent Int Student
     | DeleteStudent (List Int)
-    | StudentDeleted (List Int)
+    | ListUpdated (List Student)
 
 
 -- UPDATE
@@ -163,9 +162,9 @@ update msg model =
         SubmitStudent _ ->
             menuUpdate (always defaultMenu) model
 
-        StudentCreated student -> 
+        ListUpdated students -> 
             { model
-            | data = student :: model.data
+            | data = students
             }
 
         OpenEdit _ ->
@@ -176,12 +175,6 @@ update msg model =
         
         DeleteStudent _ ->
             model
-
-        StudentDeleted idList ->
-            { model
-            | data = List.filter (.id >> flip List.member idList >> not) model.data
-            }
-
 
 
 menuUpdate : (Menu -> Menu) -> Model -> Model
