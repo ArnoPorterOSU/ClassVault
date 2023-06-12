@@ -12,10 +12,11 @@ import Element.Input as Inp
 import Element.Border as Border
 import Element.Background as Bg
 import Element.Font as Font
+import Json.Encode exposing (Value)
 import Types.Name as Name
-import Types.Student exposing (Student)
+import Types.Student as Student exposing (Student)
 import StyleVars
-import Util exposing (maybeToBool, inRange, justWhen, flip)
+import Util exposing (maybeToBool, inRange, mfilter, flip)
 import Email
 
 
@@ -50,6 +51,8 @@ type Msg
     | CityUpdate String
     | StateUpdate String
     | ZipUpdate String
+    | SubmitStudent Value
+    | StudentCreated Student
 
 
 -- UPDATE
@@ -152,6 +155,14 @@ update msg model =
                 )
                 model
 
+        SubmitStudent _ ->
+            menuUpdate (always defaultMenu) model
+
+        StudentCreated student -> 
+            { model
+            | data = student :: model.data
+            }
+
 
 
 menuUpdate : (Menu -> Menu) -> Model -> Model
@@ -251,6 +262,16 @@ entryRow
         ]
 
 
+parseGpa : String -> Maybe Float
+parseGpa =
+    String.toFloat >> mfilter (inRange 0 4)
+
+
+parseId : List Student -> String -> Maybe Int
+parseId students =
+    String.toInt >> mfilter (not << flip List.member (List.map .id students))
+
+
 addMenu : Int -> List Student -> Menu -> Element Msg
 addMenu width students menu =
     El.column
@@ -279,7 +300,7 @@ addMenu width students menu =
             , text = menu.id
             , placeholderText = "Id #"
             , labelText = "Id Number"
-            , parser = String.toInt >> Maybe.andThen (justWhen <| not << flip List.member (List.map .id students))
+            , parser = parseId students
             , badMsg = "⚠ Must be a number that a student doesn't already have"
             }
         , entryRow
@@ -287,7 +308,7 @@ addMenu width students menu =
             , text = menu.gpa
             , placeholderText = "GPA"
             , labelText = "GPA"
-            , parser = String.toFloat >> Maybe.andThen (justWhen <| inRange 0 4)
+            , parser = parseGpa
             , badMsg = "⚠ Must be a float in the range 0.0-4.0"
             }
         , El.text "Address info"
@@ -323,12 +344,51 @@ addMenu width students menu =
             , parser = String.toInt
             , badMsg = "⚠ Must be an integer"
             }
+        , Inp.button
+            [ Bg.color <| El.rgb255 0x08 0x7c 0x29
+            , Font.color StyleVars.white
+            , Border.rounded buttonRounding
+            ]
+            { onPress = validateInputs students menu
+            , label = El.text "Save"
+            }
         ]
 
 
 badCheck : (String -> Maybe a) -> String -> Bool
 badCheck parse str =
     not <| maybeToBool (parse str) || String.isEmpty str
+
+
+validateInputs : List Student -> Menu -> Maybe Msg
+validateInputs students menu =
+    if String.isEmpty menu.name
+        || String.isEmpty menu.email
+        || String.isEmpty menu.id
+        || String.isEmpty menu.gpa
+        || String.isEmpty menu.street
+        || String.isEmpty menu.city
+        || String.isEmpty menu.state
+        || String.isEmpty menu.zip
+        || badCheck Name.fromString menu.name
+        || badCheck (parseId students) menu.id
+        || badCheck parseGpa menu.gpa
+        || badCheck String.toInt menu.zip
+    then
+        Nothing
+    else
+        Just << SubmitStudent <| Student.encode
+            { name = Maybe.withDefault { first = "", last = "", middles = []} << Name.fromString <| menu.name
+            , id = Maybe.withDefault 0 << parseId students <| menu.id
+            , email = menu.email
+            , gpa = Maybe.withDefault 0 << parseGpa <| menu.gpa
+            , address =
+                { street = menu.street
+                , city = menu.city
+                , state = menu.state
+                , zipCode = Maybe.withDefault 0 << String.toInt <| menu.zip
+                }
+            }
 
 
 -- This allows for conditional rendering of elements easily

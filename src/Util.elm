@@ -2,7 +2,7 @@ module Util exposing
     ( uncurry
     , maybeToBool
     , inRange
-    , justWhen
+    , mfilter
     , flip
     , on
     , group
@@ -44,12 +44,14 @@ inRange low high x =
 
 
 -- returns Nothing if the predicate p fails
-justWhen : (a -> Bool) -> a -> Maybe a
-justWhen p x =
-    if p x then
-        Just x
-    else
-        Nothing
+mfilter : (a -> Bool) -> Maybe a -> Maybe a
+mfilter p m =
+    case Maybe.map p m of
+        Just True ->
+            m
+        
+        _ ->
+            Nothing
 
 
 -- flips the arguments to a binary function around
