@@ -12,9 +12,6 @@ db = client.students
 students = db.studentCollection
 students.create_index([('id', pymongo.ASCENDING)], unique=True)
 
-# pprint.pprint(students.find_one())
-
-
 app = Flask(__name__)
 
 STATIC_RESOURCES = (
@@ -40,28 +37,13 @@ def main():
 
 @app.route('/create', methods=['GET', 'POST'])
 def create():
-    dummy_object = { "name": (
-        { "first": "Tiffany"
-        , "last": "Li"
-        })
-        , "id": 69420
-        , "email": "litiff@oregonstate.edu"
-        , "gpa": 3.99
-        , "address": (
-            { "city": "Corvallis"
-            , "state": "Oregon"
-            , "zipCode": 97330
-            , "street": "960 SW Washington Ave"
-            })
-    }
-
+    json = request.get_json()
     try:  
-        result = students.insert_one(dummy_object)
-    except:
-        return "Student with ID " + str(dummy_object["id"]) + " already exists!"
+        result = students.insert_one(json)
+    except Exception as e:
+        return "EXCEPTION: ", e
     else:
-        name = dummy_object["name"]
-        return "Successfully added " + name["first"] + " " + name["last"] + " into the student database!"
+        return request.data
 
 
 
@@ -88,7 +70,8 @@ def update():
         dummy_updates = {
             "name": {
                 "first": "Bobbo",
-                "last": "Jones"
+                "last": "Jones",
+                "middle": [],
             }
         }
 
@@ -103,18 +86,15 @@ def update():
 
 @app.route('/delete')
 def delete():
-    ID = 69420
+    ID = 1
     student = findStudent(ID)
     if student:
         students.delete_one({'id': ID})
-        name = student["name"]
-        return "Successfully removed " + name["first"] + " " + name["last"] + " from the student database!"
+        return ID
     else:
         return "Student with ID: " + str(ID) + " does not exist!"
 
     # students.delete_one({'id': studentID})
-    
-
 
 @app.route('/raf')
 def raf():
