@@ -348,6 +348,8 @@ addMenu width students menu =
             [ Bg.color <| El.rgb255 0x08 0x7c 0x29
             , Font.color StyleVars.white
             , Border.rounded buttonRounding
+            , El.mouseOver [Bg.color <| El.rgb255 0x3c 0xa1 0x56]
+            , El.padding StyleVars.standardPadding
             ]
             { onPress = validateInputs students menu
             , label = El.text "Save"
