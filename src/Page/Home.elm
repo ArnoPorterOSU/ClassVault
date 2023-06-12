@@ -7,7 +7,7 @@ module Page.Home exposing
     )
 
 
-import Element as El exposing (Element)
+import Element as El exposing (Element, Color)
 import Element.Input as Inp
 import Element.Border as Border
 import Element.Background as Bg
@@ -15,6 +15,7 @@ import Element.Font as Font
 import Json.Encode exposing (Value)
 import Types.Name as Name
 import Types.Student as Student exposing (Student)
+import Types.Address as Address
 import StyleVars
 import Util exposing (maybeToBool, inRange, mfilter, flip)
 import Email
@@ -53,6 +54,10 @@ type Msg
     | ZipUpdate String
     | SubmitStudent Value
     | StudentCreated Student
+    | OpenEdit Student
+    | EditStudent Int Student
+    | DeleteStudent Int
+    | StudentDeleted Int
 
 
 -- UPDATE
@@ -163,6 +168,20 @@ update msg model =
             | data = student :: model.data
             }
 
+        OpenEdit student ->
+            model
+        
+        EditStudent id attributes ->
+            model
+        
+        DeleteStudent _ ->
+            model
+
+        StudentDeleted id ->
+            { model
+            | data = List.filter (.id >> (/=) id) model.data
+            }
+
 
 
 menuUpdate : (Menu -> Menu) -> Model -> Model
@@ -200,20 +219,87 @@ view model =
                 El.table []
                     { data = model.data
                     , columns =
-                        [ { header = El.text "Name"
-                            , width = El.fill
-                            , view = .name >> Name.toString >> El.text
-                            }
-                        , { header = El.text "Id Number"
-                            , width = El.fill
-                            , view = .id >> String.fromInt >> El.text
-                            }
-                        , { header = El.text "Email"
-                            , width = El.fill
-                            , view = .email >> El.text
-                            }
+                        [ { header = header "Name"
+                          , width = El.fill
+                          , view = entry <| .name >> Name.toString
+                          }
+                        
+                        , { header = header "Email"
+                          , width = El.fill
+                          , view = entry .email
+                          }
+                        , { header = header "Id Number"
+                          , width = El.fill
+                          , view = entry <| .id >> String.fromInt
+                          }
+                        , { header = header "GPA"
+                          , width = El.fill
+                          , view = entry <| .gpa >> String.fromFloat
+                          }
+                        , { header = header "Address"
+                          , width = El.fill
+                          , view = entry <| .address >> Address.toString 
+                          }
+                        , { header = header "Edit"
+                          , width = El.fill
+                          , view = \student -> Inp.button
+                                [ Bg.color StyleVars.interactibleColor 
+                                , Font.color StyleVars.white
+                                , El.mouseOver [Bg.color StyleVars.interactibleMouseOverColor]
+                                , El.height El.fill
+                                ]
+                                { onPress = Just <| OpenEdit student
+                                , label = El.el [El.centerX] <| El.text "Edit"
+                                }
+                          }
+                        , { header = header "Delete"
+                          , width = El.fill
+                          , view = \student -> Inp.button
+                                [ Bg.color <| El.rgb255 0xff 0x0c 0x24
+                                , Font.color StyleVars.white
+                                , El.mouseOver [Bg.color <| El.rgb255 0xc1 0x00 0x09]
+                                , El.height El.fill
+                                ]
+                                { onPress = Just <| DeleteStudent student.id
+                                , label = El.el [El.centerX] <| El.text "Delete"
+                                }
+                          }
                         ]
                     }
+        ]
+
+
+tableBorderColor : Color
+tableBorderColor =
+    El.rgb255 0 0 0
+
+
+tableBorderWidth : Int
+tableBorderWidth =
+    2
+
+
+header : String -> Element Msg
+header =
+    El.text
+    >> El.el
+        [ Font.bold
+        , El.padding StyleVars.standardPadding
+        , Border.solid
+        , Border.color tableBorderColor
+        , Border.width tableBorderWidth
+        ]
+
+
+entry : (Student -> String) -> Student -> Element Msg
+entry conversion =
+    conversion
+    >> El.text
+    >> El.el
+        [ El.padding StyleVars.standardPadding
+        , Border.solid
+        , Border.color tableBorderColor
+        , Border.width tableBorderWidth
         ]
 
 
