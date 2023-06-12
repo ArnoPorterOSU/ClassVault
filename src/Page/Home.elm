@@ -190,7 +190,7 @@ view model =
             { onPress = Just ToggleMenu 
             , label = El.text <| if maybeToBool model.menu then "Close Menu" else "Add Student" 
             }
-        , When (maybeToBool model.menu) <| addMenu model.width model.data
+        , When (maybeToBool model.menu) <| addMenu model.data
             <| Maybe.withDefault defaultMenu model.menu
         , Always <| case model.data of
             [] ->
@@ -272,12 +272,11 @@ parseId students =
     String.toInt >> mfilter (not << flip List.member (List.map .id students))
 
 
-addMenu : Int -> List Student -> Menu -> Element Msg
-addMenu width students menu =
+addMenu : List Student -> Menu -> Element Msg
+addMenu students menu =
     El.column
         [ El.spacing StyleVars.standardSpacing
         , El.padding StyleVars.standardPadding
-        , El.width <| El.px width
         ]
         [ entryRow
             { onChange = NameUpdate
