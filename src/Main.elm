@@ -40,6 +40,7 @@ type Msg
     | UrlChanged Url
     | GotHomeMsg Home.Msg
     | GotStudents (Result Http.Error (List Student))
+    | StudentCreated (Result Http.Error Student)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -74,7 +75,12 @@ update msg model =
                     ( { model
                       | page = Home <| Home.update hmsg homeModel
                       }
-                    , Cmd.none
+                    , case hmsg of
+                        Home.SubmitStudent data ->
+                            submitStudent data
+                        
+                        _ ->
+                            Cmd.none
                     )
                 
                 _ ->
@@ -97,6 +103,33 @@ update msg model =
                       }
                     , Cmd.none
                     )
+
+        StudentCreated result ->
+            case result of
+                Ok student ->
+                    ( { model
+                      | data = student :: model.data
+                      , page = case model.page of
+                            Home hmodel ->
+                                Home <| Home.update (Home.StudentCreated student) hmodel
+
+                            _ ->
+                                model.page
+                      }
+                    , Cmd.none
+                    )
+                
+                Err _ ->
+                    (model, Cmd.none)
+
+
+submitStudent : Value -> Cmd Msg
+submitStudent data =
+    Http.post
+        { url = "/create"
+        , body = Http.jsonBody data
+        , expect = Http.expectJson StudentCreated Student.decode
+        }
 
 
 -- SUBSCRIPTIONS
