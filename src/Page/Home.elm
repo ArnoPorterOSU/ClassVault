@@ -53,11 +53,10 @@ type Msg
     | StateUpdate String
     | ZipUpdate String
     | SubmitStudent Value
-    | StudentCreated Student
     | OpenEdit Student
     | EditStudent Int Student
-    | DeleteStudent Int
-    | StudentDeleted Int
+    | DeleteStudent (List Int)
+    | ListUpdated (List Student)
 
 
 -- UPDATE
@@ -163,25 +162,19 @@ update msg model =
         SubmitStudent _ ->
             menuUpdate (always defaultMenu) model
 
-        StudentCreated student -> 
+        ListUpdated students -> 
             { model
-            | data = student :: model.data
+            | data = students
             }
 
-        OpenEdit student ->
+        OpenEdit _ ->
             model
         
-        EditStudent id attributes ->
+        EditStudent _ _ ->
             model
         
         DeleteStudent _ ->
             model
-
-        StudentDeleted id ->
-            { model
-            | data = List.filter (.id >> (/=) id) model.data
-            }
-
 
 
 menuUpdate : (Menu -> Menu) -> Model -> Model
@@ -255,18 +248,38 @@ view model =
                         , { header = header "Delete"
                           , width = El.fill
                           , view = \student -> Inp.button
-                                [ Bg.color <| El.rgb255 0xff 0x0c 0x24
+                                [ Bg.color deleteColor
                                 , Font.color StyleVars.white
-                                , El.mouseOver [Bg.color <| El.rgb255 0xc1 0x00 0x09]
+                                , El.mouseOver [Bg.color deleteMouseOverColor]
                                 , El.height El.fill
                                 ]
-                                { onPress = Just <| DeleteStudent student.id
+                                { onPress = Just << DeleteStudent << List.singleton <| student.id
                                 , label = El.el [El.centerX] <| El.text "Delete"
                                 }
                           }
                         ]
                     }
+        ,   Always <| Inp.button
+                [ Bg.color deleteColor
+                , Font.color StyleVars.white
+                , El.mouseOver [Bg.color deleteMouseOverColor]
+                , El.padding StyleVars.standardPadding
+                , Border.rounded buttonRounding
+                ]
+                { onPress = Just << DeleteStudent << List.map .id <| model.data
+                , label = El.text "Delete All"
+                }
         ]
+    
+
+deleteColor : Color
+deleteColor =
+    El.rgb255 0xff 0x0c 0x24
+
+
+deleteMouseOverColor : Color
+deleteMouseOverColor =
+    El.rgb255 0xc1 0x00 0x09
 
 
 tableBorderColor : Color

@@ -13,7 +13,6 @@ import Url.Parser as Parser exposing (Parser)
 -- ROUTING
 type Route
     = Home
-    -- | Calendar
     -- | Stats
 
 
@@ -21,7 +20,6 @@ parser : Parser (Route -> a) a
 parser =
     Parser.oneOf
         [ Parser.map Home Parser.top
-    --    , Parser.map Calendar <| Parser.s "calendar"
     --    , Parser.map Stats <| Parser.s "stats"
         ]
 
@@ -45,9 +43,6 @@ routeToString page =
         Home ->
             ""
     {-
-        Calendar ->
-            "calendar"
-        
         Stats ->
             "stats"
     -}
