@@ -9,6 +9,7 @@ import Element.Font as Font
 import Element.Region as Reg
 import Http
 import Json.Decode as D exposing (Value, Decoder)
+import Json.Encode as E
 import Page.Home as Home
 import Platform.Cmd as Cmd
 import Route
@@ -41,6 +42,7 @@ type Msg
     | GotHomeMsg Home.Msg
     | GotStudents (Result Http.Error (List Student))
     | StudentCreated (Result Http.Error Student)
+    | StudentDeleted (Result Http.Error Int)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -78,6 +80,9 @@ update msg model =
                     , case hmsg of
                         Home.SubmitStudent data ->
                             submitStudent data
+
+                        Home.DeleteStudent id ->
+                            deleteStudent id
                         
                         _ ->
                             Cmd.none
@@ -122,6 +127,24 @@ update msg model =
                 Err _ ->
                     (model, Cmd.none)
 
+        StudentDeleted result ->
+            case result of
+                Ok id ->
+                    ( { model
+                      | data = List.filter (.id >> (/=) id) model.data
+                      , page = case model.page of
+                        Home hmodel ->
+                            Home <| Home.update (Home.StudentDeleted id) hmodel
+                        
+                        _ ->
+                            model.page
+                      }
+                    , Cmd.none
+                    )
+
+                Err _ ->
+                    (model, Cmd.none)
+
 
 submitStudent : Value -> Cmd Msg
 submitStudent data =
@@ -129,6 +152,15 @@ submitStudent data =
         { url = "/create"
         , body = Http.jsonBody data
         , expect = Http.expectJson StudentCreated Student.decode
+        }
+
+    
+deleteStudent : Int -> Cmd Msg
+deleteStudent id =
+    Http.post
+        { url = "/delete"
+        , body = Http.jsonBody <| E.int id
+        , expect = Http.expectJson StudentDeleted D.int
         }
 
 
@@ -175,7 +207,6 @@ view model =
                 ]
                 [ navButton "Home"
                 , navButton "Stats"
-                , navButton "Calendar"
                 ]
             ,   case model.page of
                     Home hmodel ->
