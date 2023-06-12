@@ -95,8 +95,6 @@ def delete():
         return "Student with ID: " + str(ID) + " does not exist!"
 
     # students.delete_one({'id': studentID})
-    
-
 
 @app.route('/raf')
 def raf():
