@@ -14,7 +14,7 @@ import Page.Home as Home
 import Platform.Cmd as Cmd
 import Route
 import Url exposing (Url)
-import Util exposing (uncurry)
+import Util exposing (uncurry, flip)
 import Types.Student as Student exposing (Student)
 import StyleVars
 
@@ -42,7 +42,7 @@ type Msg
     | GotHomeMsg Home.Msg
     | GotStudents (Result Http.Error (List Student))
     | StudentCreated (Result Http.Error Student)
-    | StudentDeleted (Result Http.Error Int)
+    | StudentDeleted (Result Http.Error (List Int))
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -81,8 +81,8 @@ update msg model =
                         Home.SubmitStudent data ->
                             submitStudent data
 
-                        Home.DeleteStudent id ->
-                            deleteStudent id
+                        Home.DeleteStudent idList ->
+                            deleteStudent idList
                         
                         _ ->
                             Cmd.none
@@ -129,12 +129,12 @@ update msg model =
 
         StudentDeleted result ->
             case result of
-                Ok id ->
+                Ok idList ->
                     ( { model
-                      | data = List.filter (.id >> (/=) id) model.data
+                      | data = List.filter (.id >> flip List.member idList >> not) model.data
                       , page = case model.page of
                         Home hmodel ->
-                            Home <| Home.update (Home.StudentDeleted id) hmodel
+                            Home <| Home.update (Home.StudentDeleted idList) hmodel
                         
                         _ ->
                             model.page
@@ -155,12 +155,12 @@ submitStudent data =
         }
 
     
-deleteStudent : Int -> Cmd Msg
-deleteStudent id =
+deleteStudent : List Int -> Cmd Msg
+deleteStudent idList =
     Http.post
         { url = "/delete"
-        , body = Http.jsonBody <| E.int id
-        , expect = Http.expectJson StudentDeleted D.int
+        , body = Http.jsonBody <| E.list E.int idList
+        , expect = Http.expectJson StudentDeleted <| D.list D.int
         }
 
 
