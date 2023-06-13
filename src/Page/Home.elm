@@ -230,7 +230,7 @@ view model =
         , El.padding StyleVars.standardPadding
         , El.spacing StyleVars.standardSpacing
         ] <|
-        [ El.row [El.width El.fill, El.spacing <| model.width * 4 // 5] <| conditional
+        [ El.row [El.width El.fill, El.spacing <| model.width * 3 // 5] <| conditional
             [ Always <| Inp.button
                 [ El.mouseOver [Bg.color StyleVars.interactibleMouseOverColor]
                 , Bg.color StyleVars.interactibleColor
@@ -241,11 +241,11 @@ view model =
                 { onPress = Just ToggleMenu 
                 , label = El.text <| if hasMenuOpen model.menu then "Close Menu" else "Add Student" 
                 }
-            , When (not <| hasMenuOpen model.menu) <| Inp.search []
+            , When (not <| hasMenuOpen model.menu) <| Inp.search [El.width << El.px <| model.width // 5]
                 { onChange = SearchBarUpdated
                 , text = model.search
                 , placeholder = Just <| Inp.placeholder [] <| El.text "123456"
-                , label = Inp.labelAbove [] <| El.text "Search by ID"
+                , label = Inp.labelLeft [] <| El.text "Search by ID"
                 }
             ]
         , case model.menu of
