@@ -8,6 +8,7 @@ module Util exposing
     , group
     , groupBy
     , groupWith
+    , filterJust
     )
 
 
@@ -110,3 +111,17 @@ groupBy =
 group : List a -> List (List a)
 group =
     groupWith (==)
+
+
+-- filters all the Nothing values out of a list
+filterJust : List (Maybe a) -> List a
+filterJust maybes =
+    case maybes of
+        [] ->
+            []
+
+        Nothing::xs ->
+            filterJust xs
+        
+        Just x::xs ->
+            x :: filterJust xs

@@ -11,12 +11,14 @@ import Http
 import Json.Decode as D exposing (Value, Decoder)
 import Json.Encode as E
 import Page.Home as Home
+import Page.Stats as Stats
 import Platform.Cmd as Cmd
 import Route
 import Url exposing (Url)
 import Util exposing (uncurry, flip)
 import Types.Student as Student exposing (Student)
 import StyleVars
+import Page.Stats as Stats
 
 
 -- MODEL
@@ -31,6 +33,7 @@ type alias Model =
 
 type Page
     = Home Home.Model
+    | Stats Stats.Model
     | Error String
     | Loading
 
@@ -40,10 +43,12 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url
     | GotHomeMsg Home.Msg
+    | GotStatsMsg Stats.Msg
     | GotStudents (Result Http.Error (List Student))
     | StudentCreated (Result Http.Error Student)
     | StudentDeleted (Result Http.Error (List Int))
     | StudentUpdated (Result Http.Error StudentUpdateRecord)
+    | QuickChartResponse (Result Http.Error String)
 
 
 type alias StudentUpdateRecord =
@@ -71,7 +76,14 @@ update msg model =
                     case route of
                         Route.Home ->
                             ( { model
-                              | page = Home <| Home.init { width = model.width, students = model.data }
+                              | page = Home <| Home.init { width = model.width, data = model.data }
+                              }
+                            , Cmd.none
+                            )
+                        
+                        Route.Stats ->
+                            ( { model
+                              | page = Stats <| Stats.init model.data
                               }
                             , Cmd.none
                             )
@@ -101,12 +113,27 @@ update msg model =
                 _ ->
                     (model, Cmd.none)
 
+        GotStatsMsg smsg ->
+            case model.page of
+                Stats _ ->
+                    ( model
+                    , case smsg of
+                        Stats.GenerateChart json ->
+                            pingQuickChart json
+
+                        _ ->
+                            Cmd.none
+                    )
+                
+                _ ->
+                    (model, Cmd.none)
+
         GotStudents result ->
             case result of
                 Ok students ->
                     ( { model
                       | data = students
-                      , page = Home <| Home.init { width = model.width, students = students }
+                      , page = Home <| Home.init { width = model.width, data = students }
                       }
                     , Cmd.none
                     )
@@ -188,6 +215,28 @@ update msg model =
                 Err _ ->
                     (model, Cmd.none)
 
+        QuickChartResponse result ->
+            case result of
+                Ok url ->
+                    ( { model
+                      | page = case model.page of
+                            Stats smodel ->
+                                Stats <| Stats.update (Stats.UpdateChart url) smodel
+
+                            _ ->
+                                model.page
+                      }
+                    , Cmd.none
+                    )
+                
+                Err _ ->
+                    ( { model
+                      | page = Error "Fix the quickchart API call"
+                      }
+                    , Cmd.none
+                    )
+
+
 
 submitStudent : Value -> Cmd Msg
 submitStudent data =
@@ -220,6 +269,15 @@ updateStudent id data =
                 StudentUpdateRecord
                     (D.field "id" D.int)
                     (D.field "student" Student.decode)
+        }
+
+
+pingQuickChart : Value -> Cmd Msg
+pingQuickChart json =
+    Http.post
+        { url = "https://quickchart.io/chart"
+        , body = Http.jsonBody json
+        , expect = Http.expectJson QuickChartResponse <| D.field "url" D.string
         }
 
 
@@ -271,11 +329,14 @@ view model =
                     Home hmodel ->
                         El.map GotHomeMsg <| Home.view hmodel
 
+                    Stats smodel ->
+                        El.map GotStatsMsg <| Stats.view smodel
+
                     Loading ->
-                        El.el [] <| El.text "Loading..."
+                        El.el [El.padding StyleVars.standardPadding] <| El.text "Loading..."
 
                     Error error ->
-                        El.el [] <| El.text error
+                        El.el [El.padding StyleVars.standardPadding] <| El.text error
             ]
         ]
     }
