@@ -20,8 +20,8 @@
 ![image](https://github.com/ArnoPorterOSU/ClassVault/assets/91599803/a9a9b2ca-c2f7-4894-848a-35ff8faa4cba)
 
 ### 3. Remove student information from a database
-  - Easily remove students from the database using the student's ID.
-  - Easily maintain an up-to-date and relevant database.
+  - Effortlessly remove students from the database using the student's ID.
+  - Comfortably maintain an up-to-date and relevant database.
   - Allows user to remove student information individually or remove all student information on the database using a single button. 
 
 ![image](https://github.com/ArnoPorterOSU/ClassVault/assets/91599803/d6ae3652-fd60-4fe5-80db-f584466f3795)
