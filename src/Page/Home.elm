@@ -26,6 +26,7 @@ type alias Model =
     { menu : MenuType
     , data : List Student
     , width : Int
+    , search : String
     }
 
 
@@ -63,6 +64,7 @@ type Msg
     | OpenEdit Student
     | DeleteStudent (List Int)
     | ListUpdated (List Student)
+    | SearchBarUpdated String
 
 
 -- UPDATE
@@ -84,7 +86,8 @@ update msg model =
     case msg of
         ToggleMenu -> 
             { model
-            | menu =
+            | search = ""
+            , menu =
                 case model.menu of
                     AllClosed ->
                         AddStudent defaultMenu
@@ -192,9 +195,16 @@ update msg model =
             { model
             | data = students
             }
+        
+        SearchBarUpdated search ->
+            { model
+            | search = search
+            }
 
         _ ->
-            model
+            { model
+            | search = ""
+            }
 
 
 menuUpdate : (Menu -> Menu) -> Model -> Model
@@ -220,16 +230,24 @@ view model =
         , El.padding StyleVars.standardPadding
         , El.spacing StyleVars.standardSpacing
         ] <|
-        [ Inp.button
-            [ El.mouseOver [Bg.color StyleVars.interactibleMouseOverColor]
-            , Bg.color StyleVars.interactibleColor
-            , Border.rounded buttonRounding
-            , Font.color StyleVars.white
-            , El.padding StyleVars.standardPadding
+        [ El.row [El.width El.fill, El.spacing <| model.width * 4 // 5] <| conditional
+            [ Always <| Inp.button
+                [ El.mouseOver [Bg.color StyleVars.interactibleMouseOverColor]
+                , Bg.color StyleVars.interactibleColor
+                , Border.rounded buttonRounding
+                , Font.color StyleVars.white
+                , El.padding StyleVars.standardPadding
+                ]
+                { onPress = Just ToggleMenu 
+                , label = El.text <| if hasMenuOpen model.menu then "Close Menu" else "Add Student" 
+                }
+            , When (not <| hasMenuOpen model.menu) <| Inp.search []
+                { onChange = SearchBarUpdated
+                , text = model.search
+                , placeholder = Just <| Inp.placeholder [] <| El.text "123456"
+                , label = Inp.labelAbove [] <| El.text "Search by ID"
+                }
             ]
-            { onPress = Just ToggleMenu 
-            , label = El.text <| if hasMenuOpen model.menu then "Close Menu" else "Add Student" 
-            }
         , case model.menu of
             AddStudent menu ->
                 studentMenu SubmitStudent Nothing model.data menu
@@ -252,7 +270,7 @@ view model =
 
                     _ -> 
                         El.table []
-                            { data = model.data
+                            { data = List.filter (.id >> String.fromInt >> String.startsWith model.search) model.data
                             , columns =
                                 [   { header = header "Name"
                                     , width = El.fill
@@ -596,4 +614,5 @@ init
     { menu = AllClosed
     , data = students
     , width = width
+    , search = ""
     }
