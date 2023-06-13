@@ -10,6 +10,8 @@ module Page.Stats exposing
 import Dict exposing (Dict)
 import Element as El exposing (Element)
 import Element.Input as Inp
+import Element.Border as Border
+import Element.Background as Bg
 import Json.Encode as E exposing (Value)
 import StyleVars
 import Types.Student exposing (Student)
@@ -48,7 +50,10 @@ update msg model =
 
 view : Model -> Element Msg
 view model =
-    El.column [El.spacing StyleVars.standardSpacing]
+    El.column
+        [ El.spacing StyleVars.standardSpacing
+        , El.padding StyleVars.standardPadding
+        ]
         [ El.row []
             [ freqButton model.data "First Name" (.name >> .first)
             , freqButton model.data "State" (.address >> .state)
@@ -67,7 +72,13 @@ view model =
 
 freqButton : List Student -> String -> (Student -> String) -> Element Msg
 freqButton students label accessor =
-    Inp.button [El.padding StyleVars.standardPadding]
+    Inp.button
+        [ El.padding StyleVars.standardPadding
+        , Bg.color <| El.rgb255 0xd3 0xd3 0xd3
+        , El.mouseOver [Bg.color StyleVars.white]
+        , Border.color <| El.rgb255 0 0 0
+        , Border.width 1
+        ]
         { onPress =
             students |>
             Just << GenerateChart
