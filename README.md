@@ -52,3 +52,5 @@ HTTPS
 ```bash
 git clone https://github.com/ArnoPorterOSU/ClassVault/
 ```
+
+Install the requirements by running `pip install -r requirements.txt`
