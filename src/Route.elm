@@ -1,11 +1,9 @@
 module Route exposing
     ( Route(..)
     , fromUrl
-    , replaceUrl
     )
 
 
-import Browser.Navigation as Nav
 import Url exposing (Url)
 import Url.Parser as Parser exposing (Parser)
 
@@ -13,36 +11,18 @@ import Url.Parser as Parser exposing (Parser)
 -- ROUTING
 type Route
     = Home
-    -- | Stats
+    | Stats
 
 
 parser : Parser (Route -> a) a
 parser =
     Parser.oneOf
         [ Parser.map Home Parser.top
-    --    , Parser.map Stats <| Parser.s "stats"
+        , Parser.map Stats <| Parser.s "stats"
         ]
 
     
 -- PUBLIC
-replaceUrl : Nav.Key -> Route -> Cmd msg
-replaceUrl key route =
-    Nav.replaceUrl key <| routeToString route
-
-
 fromUrl : Url -> Maybe Route
-fromUrl url =
-    { url | path = Maybe.withDefault "" url.fragment, fragment = Nothing }
-        |> Parser.parse parser
-
-
--- PRIVATE
-routeToString : Route -> String
-routeToString page =
-    "#/" ++ case page of
-        Home ->
-            ""
-    {-
-        Stats ->
-            "stats"
-    -}
+fromUrl =
+    Parser.parse parser

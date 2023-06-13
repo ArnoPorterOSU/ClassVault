@@ -605,14 +605,14 @@ conditional =
 -- INIT
 init :
     { width : Int
-    , students : List Student
+    , data : List Student
     } -> Model
 init
     { width
-    , students
+    , data
     } =
     { menu = AllClosed
-    , data = students
+    , data = data
     , width = width
     , search = ""
     }
