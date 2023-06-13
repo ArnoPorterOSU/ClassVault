@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 
 import Browser
@@ -18,7 +18,8 @@ import Url exposing (Url)
 import Util exposing (uncurry, flip)
 import Types.Student as Student exposing (Student)
 import StyleVars
-import Page.Stats as Stats
+import Platform.Cmd as Cmd
+import Platform.Cmd as Cmd
 
 
 -- MODEL
@@ -48,7 +49,7 @@ type Msg
     | StudentCreated (Result Http.Error Student)
     | StudentDeleted (Result Http.Error (List Int))
     | StudentUpdated (Result Http.Error StudentUpdateRecord)
-    | QuickChartResponse (Result Http.Error String)
+    | QuickChartResponse String
 
 
 type alias StudentUpdateRecord =
@@ -119,7 +120,7 @@ update msg model =
                     ( model
                     , case smsg of
                         Stats.GenerateChart json ->
-                            pingQuickChart json
+                            quickChart json
 
                         _ ->
                             Cmd.none
@@ -215,27 +216,19 @@ update msg model =
                 Err _ ->
                     (model, Cmd.none)
 
-        QuickChartResponse result ->
-            case result of
-                Ok url ->
-                    ( { model
-                      | page = case model.page of
-                            Stats smodel ->
-                                Stats <| Stats.update (Stats.UpdateChart url) smodel
-
-                            _ ->
-                                model.page
-                      }
-                    , Cmd.none
-                    )
+        QuickChartResponse url ->
+            ( case model.page of
+                Stats smodel ->
+                    { model
+                    | page = Stats <| Stats.update (Stats.UpdateChart url) smodel
+                    }
                 
-                Err _ ->
-                    ( { model
-                      | page = Error "Fix the quickchart API call"
-                      }
-                    , Cmd.none
-                    )
+                _ ->
+                    model
 
+            , Cmd.none
+            )
+                    
 
 
 submitStudent : Value -> Cmd Msg
@@ -272,19 +265,16 @@ updateStudent id data =
         }
 
 
-pingQuickChart : Value -> Cmd Msg
-pingQuickChart json =
-    Http.post
-        { url = "https://quickchart.io/chart"
-        , body = Http.jsonBody json
-        , expect = Http.expectJson QuickChartResponse <| D.field "url" D.string
-        }
+port quickChart : Value -> Cmd msg
+port gotImg : (String -> msg) -> Sub msg
 
 
 -- SUBSCRIPTIONS
+
 subscriptions : Model -> Sub Msg
 subscriptions =
-    always Sub.none
+    always <|
+        gotImg QuickChartResponse
 
 
 -- VIEW

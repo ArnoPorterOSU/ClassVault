@@ -19,6 +19,27 @@
                 height: window.innerHeight
             }
             const app = Elm.Main.init({flags: flags})
+
+            let chartUrl
+
+            app.ports.quickChart.subscribe(async (data) => {
+                const res = await fetch('https://quickchart.io/chart', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+
+                if (res.ok) {
+                    const blob = await res.blob()
+                    console.log(blob)
+                    window.URL.revokeObjectURL(chartUrl)
+                    app.ports.gotImg.send(chartUrl = window.URL.createObjectURL(blob))
+                } else {
+                    console.warn('quickchart API did not correctly respond')
+                }
+            })
         </script>
     </body>
 </html>
