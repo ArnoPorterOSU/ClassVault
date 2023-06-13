@@ -30,7 +30,7 @@
   - Easily receive and view a student's information from the database using the student's ID
   - Allows the user to more easily find a student's information.
 
-![image](https://github.com/ArnoPorterOSU/ClassVault/assets/91599803/40a4ec32-cf7e-4a2d-b75d-22392a4863ad)
+![image](https://github.com/ArnoPorterOSU/ClassVault/assets/91599803/ee3e06d3-7152-457a-8e15-1d020f6ab8cb)
 
 
 ## Dependencies
