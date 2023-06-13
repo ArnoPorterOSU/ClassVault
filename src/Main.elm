@@ -43,6 +43,13 @@ type Msg
     | GotStudents (Result Http.Error (List Student))
     | StudentCreated (Result Http.Error Student)
     | StudentDeleted (Result Http.Error (List Int))
+    | StudentUpdated (Result Http.Error StudentUpdateRecord)
+
+
+type alias StudentUpdateRecord =
+    { id : Int
+    , student : Student
+    }
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -83,6 +90,9 @@ update msg model =
 
                         Home.DeleteStudent idList ->
                             deleteStudent idList
+
+                        Home.UpdateStudent id data ->
+                            updateStudent id data
                         
                         _ ->
                             Cmd.none
@@ -150,6 +160,33 @@ update msg model =
 
                 Err _ ->
                     (model, Cmd.none)
+        
+        StudentUpdated result ->
+            case result of
+                Ok studentUpdate ->
+                    let
+                        newStudents = List.map (\s ->
+                                if s.id == studentUpdate.id then
+                                    studentUpdate.student
+                                else
+                                    s
+                            )
+                            model.data
+                    in
+                        ( { model
+                          | data = newStudents
+                          , page = case model.page of
+                                Home hmodel ->
+                                    Home <| Home.update (Home.ListUpdated newStudents) hmodel
+                                
+                                _ ->
+                                    model.page
+                          }
+                        , Cmd.none
+                        )
+                
+                Err _ ->
+                    (model, Cmd.none)
 
 
 submitStudent : Value -> Cmd Msg
@@ -167,6 +204,22 @@ deleteStudent idList =
         { url = "/delete"
         , body = Http.jsonBody <| E.list E.int idList
         , expect = Http.expectJson StudentDeleted <| D.list D.int
+        }
+
+
+updateStudent : Int -> Value -> Cmd Msg
+updateStudent id data =
+    Http.post
+        { url = "/update"
+        , body = Http.jsonBody <| E.object
+            [ ("id", E.int id)
+            , ("student", data)
+            ]
+        , expect = Http.expectJson StudentUpdated <|
+            D.map2
+                StudentUpdateRecord
+                    (D.field "id" D.int)
+                    (D.field "student" Student.decode)
         }
 
 

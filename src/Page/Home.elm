@@ -17,7 +17,7 @@ import Types.Name as Name
 import Types.Student as Student exposing (Student)
 import Types.Address as Address
 import StyleVars
-import Util exposing (maybeToBool, inRange, mfilter, flip)
+import Util exposing (maybeToBool, inRange, mfilter)
 import Email
 
 
@@ -32,7 +32,7 @@ type alias Model =
 type MenuType
     = AllClosed
     | AddStudent Menu
-    | Modal Menu
+    | EditStudent Int Menu
 
 
 type alias Menu =
@@ -59,8 +59,8 @@ type Msg
     | StateUpdate String
     | ZipUpdate String
     | SubmitStudent Value
+    | UpdateStudent Int Value
     | OpenEdit Student
-    | EditStudent Int Student
     | DeleteStudent (List Int)
     | ListUpdated (List Student)
 
@@ -91,6 +91,21 @@ update msg model =
 
                     _ ->
                         AllClosed
+            }
+        
+        OpenEdit student ->
+            { model
+            | menu =
+                EditStudent student.id
+                    { name = Name.toString student.name
+                    , email = student.email
+                    , id = String.fromInt student.id
+                    , gpa = String.fromFloat student.gpa
+                    , street = student.address.street
+                    , city = student.address.city
+                    , state = student.address.state
+                    , zip = String.fromInt student.address.zipCode
+                    }
             }
 
         NameUpdate name ->
@@ -168,6 +183,11 @@ update msg model =
         SubmitStudent _ ->
             menuUpdate (always defaultMenu) model
 
+        UpdateStudent _ _ ->
+            { model
+            | menu = AllClosed
+            }
+
         ListUpdated students -> 
             { model
             | data = students
@@ -176,6 +196,7 @@ update msg model =
         _ ->
             model
 
+
 menuUpdate : (Menu -> Menu) -> Model -> Model
 menuUpdate nextMenu model =
     { model
@@ -183,22 +204,12 @@ menuUpdate nextMenu model =
         AddStudent menu ->
             AddStudent <| nextMenu menu
 
-        Modal menu ->
-            Modal <| nextMenu menu
+        EditStudent id menu ->
+            EditStudent id <| nextMenu menu
         
         menu ->
             menu
     }
-
-
-isAddMenu : MenuType -> Bool
-isAddMenu menu =
-    case menu of
-        AddStudent _ ->
-            True
-        
-        _ ->
-            False
 
 
 -- VIEW
@@ -208,7 +219,7 @@ view model =
         [ El.width El.fill
         , El.padding StyleVars.standardPadding
         , El.spacing StyleVars.standardSpacing
-        ]
+        ] <|
         [ Inp.button
             [ El.mouseOver [Bg.color StyleVars.interactibleMouseOverColor]
             , Bg.color StyleVars.interactibleColor
@@ -217,81 +228,102 @@ view model =
             , El.padding StyleVars.standardPadding
             ]
             { onPress = Just ToggleMenu 
-            , label = El.text <| if isAddMenu model.menu then "Close Menu" else "Add Student" 
+            , label = El.text <| if hasMenuOpen model.menu then "Close Menu" else "Add Student" 
             }
         , case model.menu of
             AddStudent menu ->
-                studentMenu model.data menu
+                studentMenu SubmitStudent Nothing model.data menu
+            
+            EditStudent id menu ->
+                studentMenu (UpdateStudent id) (Just id) model.data menu
             
             _ ->
                 El.none
-        , case model.data of
-            [] ->
-                El.el [] <| El.text "Nothing here"
-
-            _ -> 
-                El.table []
-                    { data = model.data
-                    , columns =
-                        [ { header = header "Name"
-                          , width = El.fill
-                          , view = entry <| .name >> Name.toString
-                          }
-                        
-                        , { header = header "Email"
-                          , width = El.fill
-                          , view = entry .email
-                          }
-                        , { header = header "Id Number"
-                          , width = El.fill
-                          , view = entry <| .id >> String.fromInt
-                          }
-                        , { header = header "GPA"
-                          , width = El.fill
-                          , view = entry <| .gpa >> String.fromFloat
-                          }
-                        , { header = header "Address"
-                          , width = El.fill
-                          , view = entry <| .address >> Address.toString 
-                          }
-                        , { header = header "Edit"
-                          , width = El.fill
-                          , view = \student -> Inp.button
-                                [ Bg.color StyleVars.interactibleColor 
-                                , Font.color StyleVars.white
-                                , El.mouseOver [Bg.color StyleVars.interactibleMouseOverColor]
-                                , El.height El.fill
-                                ]
-                                { onPress = Just <| OpenEdit student
-                                , label = El.el [El.centerX] <| El.text "Edit"
-                                }
-                          }
-                        , { header = header "Delete"
-                          , width = El.fill
-                          , view = \student -> Inp.button
-                                [ Bg.color deleteColor
-                                , Font.color StyleVars.white
-                                , El.mouseOver [Bg.color deleteMouseOverColor]
-                                , El.height El.fill
-                                ]
-                                { onPress = Just << DeleteStudent << List.singleton <| student.id
-                                , label = El.el [El.centerX] <| El.text "Delete"
-                                }
-                          }
-                        ]
-                    }
-        , Inp.button
-            [ Bg.color deleteColor
-            , Font.color StyleVars.white
-            , El.mouseOver [Bg.color deleteMouseOverColor]
-            , El.padding StyleVars.standardPadding
-            , Border.rounded buttonRounding
-            ]
-            { onPress = Just << DeleteStudent << List.map .id <| model.data
-            , label = El.text "Delete All"
-            }
         ]
-    
+        ++
+        case model.menu of
+            EditStudent _ _ ->
+                []
+            
+            _ ->
+                [ case model.data of
+                    [] ->
+                        El.el [] <| El.text "Nothing here"
+
+                    _ -> 
+                        El.table []
+                            { data = model.data
+                            , columns =
+                                [   { header = header "Name"
+                                    , width = El.fill
+                                    , view = entry <| .name >> Name.toString
+                                    }
+                                ,   { header = header "Email"
+                                    , width = El.fill
+                                    , view = entry .email
+                                    }
+                                ,   { header = header "Id Number"
+                                    , width = El.fill
+                                    , view = entry <| .id >> String.fromInt
+                                    }
+                                ,   { header = header "GPA"
+                                    , width = El.fill
+                                    , view = entry <| .gpa >> String.fromFloat
+                                    }
+                                ,   { header = header "Address"
+                                    , width = El.fill
+                                    , view = entry <| .address >> Address.toString 
+                                    }
+                                ,   { header = header "Edit"
+                                    , width = El.fill
+                                    , view = \student -> Inp.button
+                                        [ Bg.color StyleVars.interactibleColor 
+                                        , Font.color StyleVars.white
+                                        , El.mouseOver [Bg.color StyleVars.interactibleMouseOverColor]
+                                        , El.height El.fill
+                                        ]
+                                        { onPress = Just <| OpenEdit student
+                                        , label = El.el [El.centerX] <| El.text "Edit"
+                                        }
+                                    }
+                                ,   { header = header "Delete"
+                                    , width = El.fill
+                                    , view = \student -> Inp.button
+                                        [ Bg.color deleteColor
+                                        , Font.color StyleVars.white
+                                        , El.mouseOver [Bg.color deleteMouseOverColor]
+                                        , El.height El.fill
+                                        ]
+                                        { onPress = Just << DeleteStudent << List.singleton <| student.id
+                                        , label = El.el [El.centerX] <| El.text "Delete"
+                                        }
+                                    }
+                                ]
+                            }
+                , Inp.button
+                    [ Bg.color deleteColor
+                    , Font.color StyleVars.white
+                    , El.mouseOver [Bg.color deleteMouseOverColor]
+                    , El.padding StyleVars.standardPadding
+                    , Border.rounded buttonRounding
+                    ]
+                    { onPress = Just << DeleteStudent << List.map .id <| model.data
+                    , label = El.text "Delete All"
+                    }
+                ]
+
+
+hasMenuOpen : MenuType -> Bool
+hasMenuOpen menu =
+    case menu of
+        AddStudent _ ->
+            True
+        
+        EditStudent _ _ ->
+            True
+        
+        _ ->
+            False
 
 deleteColor : Color
 deleteColor =
@@ -387,14 +419,26 @@ parseGpa =
     String.toFloat >> mfilter (inRange 0 4)
 
 
-parseId : List Student -> String -> Maybe Int
-parseId students =
-    String.toInt >> mfilter (not << flip List.member (List.map .id students))
+parseId : Maybe Int -> List Student -> String -> Maybe Int
+parseId mid students =
+        String.toInt
+        >>  mfilter (\x ->
+                (case mid of
+                    Just eid ->
+                        x == eid
+                    
+                    Nothing ->
+                        False
+                )
+                ||
+                not (List.member x <| List.map .id students)
+            )
 
 
-studentMenu : List Student -> Menu -> Element Msg
-studentMenu students menu =
-    El.column []
+
+studentMenu : (Value -> Msg) -> Maybe Int -> List Student -> Menu -> Element Msg
+studentMenu msg mid students menu =
+    El.column [El.spacing StyleVars.standardSpacing]
         [ entryRow
             { onChange = NameUpdate
             , text = menu.name
@@ -416,7 +460,7 @@ studentMenu students menu =
             , text = menu.id
             , placeholderText = "Id #"
             , labelText = "Id Number"
-            , parser = parseId students
+            , parser = parseId mid students
             , badMsg = "⚠ Must be a number that a student doesn't already have"
             }
         , entryRow
@@ -467,7 +511,7 @@ studentMenu students menu =
             , El.mouseOver [Bg.color <| El.rgb255 0x3c 0xa1 0x56]
             , El.padding StyleVars.standardPadding
             ]
-            { onPress = validateInputs students menu
+            { onPress = validateInputs msg mid students menu
             , label = El.text "Save"
             }
         ]
@@ -478,8 +522,8 @@ badCheck parse str =
     not <| maybeToBool (parse str) || String.isEmpty str
 
 
-validateInputs : List Student -> Menu -> Maybe Msg
-validateInputs students menu =
+validateInputs : (Value -> Msg) -> Maybe Int -> List Student -> Menu -> Maybe Msg
+validateInputs msg mid students menu =
     if String.isEmpty menu.name
         || String.isEmpty menu.email
         || String.isEmpty menu.id
@@ -489,15 +533,15 @@ validateInputs students menu =
         || String.isEmpty menu.state
         || String.isEmpty menu.zip
         || badCheck Name.fromString menu.name
-        || badCheck (parseId students) menu.id
+        || badCheck (parseId mid students) menu.id
         || badCheck parseGpa menu.gpa
         || badCheck String.toInt menu.zip
     then
         Nothing
     else
-        Just << SubmitStudent <| Student.encode
+        Just << msg <| Student.encode
             { name = Maybe.withDefault { first = "", last = "", middles = []} << Name.fromString <| menu.name
-            , id = Maybe.withDefault 0 << parseId students <| menu.id
+            , id = Maybe.withDefault 0 << parseId mid students <| menu.id
             , email = menu.email
             , gpa = Maybe.withDefault 0 << parseGpa <| menu.gpa
             , address =
