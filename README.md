@@ -53,4 +53,21 @@ HTTPS
 git clone https://github.com/ArnoPorterOSU/ClassVault/
 ```
 
-Install the requirements by running `pip install -r requirements.txt`
+Install the requirements by running
+```bash
+pip install -r requirements.txt
+```
+
+Compile the javascript by running either
+```ps
+./make.ps1 # Powershell
+```
+
+```bash
+./make.bash # Bash
+```
+
+Start the application with
+```bash
+flask run
+```
