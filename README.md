@@ -4,6 +4,20 @@
 
 ## Supported Features
 
+# Add student information to a database
+- Easily add student information: Names, Emails, Student IDs, GPAs, and Location.
+- Saved to a database for later retrieval and viewing.
+- Intuitive form prompts. 
+
+# Edit student information on a database
+- asdf
+- asdf
+
+# Remove student information from a database
+
+# Search for student information
+
+
 ## Dependencies
 
 * [Elm](https://guide.elm-lang.org/install/elm.html). Elm is a functional programming language for frontend web development.
