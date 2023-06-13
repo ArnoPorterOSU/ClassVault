@@ -23,10 +23,16 @@ import Email
 
 -- MODEL
 type alias Model =
-    { menu : Maybe Menu
+    { menu : MenuType
     , data : List Student
     , width : Int
     }
+
+
+type MenuType
+    = AllClosed
+    | AddStudent Menu
+    | Modal Menu
 
 
 type alias Menu =
@@ -80,11 +86,11 @@ update msg model =
             { model
             | menu =
                 case model.menu of
-                    Nothing ->
-                        Just defaultMenu
+                    AllClosed ->
+                        AddStudent defaultMenu
 
                     _ ->
-                        Nothing
+                        AllClosed
             }
 
         NameUpdate name ->
@@ -167,21 +173,32 @@ update msg model =
             | data = students
             }
 
-        OpenEdit _ ->
+        _ ->
             model
-        
-        EditStudent _ _ ->
-            model
-        
-        DeleteStudent _ ->
-            model
-
 
 menuUpdate : (Menu -> Menu) -> Model -> Model
 menuUpdate nextMenu model =
     { model
-    | menu = Maybe.map nextMenu model.menu
+    | menu = case model.menu of
+        AddStudent menu ->
+            AddStudent <| nextMenu menu
+
+        Modal menu ->
+            Modal <| nextMenu menu
+        
+        menu ->
+            menu
     }
+
+
+isAddMenu : MenuType -> Bool
+isAddMenu menu =
+    case menu of
+        AddStudent _ ->
+            True
+        
+        _ ->
+            False
 
 
 -- VIEW
@@ -191,8 +208,8 @@ view model =
         [ El.width El.fill
         , El.padding StyleVars.standardPadding
         , El.spacing StyleVars.standardSpacing
-        ] <| conditional
-        [ Always <| Inp.button
+        ]
+        [ Inp.button
             [ El.mouseOver [Bg.color StyleVars.interactibleMouseOverColor]
             , Bg.color StyleVars.interactibleColor
             , Border.rounded buttonRounding
@@ -200,11 +217,15 @@ view model =
             , El.padding StyleVars.standardPadding
             ]
             { onPress = Just ToggleMenu 
-            , label = El.text <| if maybeToBool model.menu then "Close Menu" else "Add Student" 
+            , label = El.text <| if isAddMenu model.menu then "Close Menu" else "Add Student" 
             }
-        , When (maybeToBool model.menu) <| addMenu model.data
-            <| Maybe.withDefault defaultMenu model.menu
-        , Always <| case model.data of
+        , case model.menu of
+            AddStudent menu ->
+                studentMenu model.data menu
+            
+            _ ->
+                El.none
+        , case model.data of
             [] ->
                 El.el [] <| El.text "Nothing here"
 
@@ -259,16 +280,16 @@ view model =
                           }
                         ]
                     }
-        ,   Always <| Inp.button
-                [ Bg.color deleteColor
-                , Font.color StyleVars.white
-                , El.mouseOver [Bg.color deleteMouseOverColor]
-                , El.padding StyleVars.standardPadding
-                , Border.rounded buttonRounding
-                ]
-                { onPress = Just << DeleteStudent << List.map .id <| model.data
-                , label = El.text "Delete All"
-                }
+        , Inp.button
+            [ Bg.color deleteColor
+            , Font.color StyleVars.white
+            , El.mouseOver [Bg.color deleteMouseOverColor]
+            , El.padding StyleVars.standardPadding
+            , Border.rounded buttonRounding
+            ]
+            { onPress = Just << DeleteStudent << List.map .id <| model.data
+            , label = El.text "Delete All"
+            }
         ]
     
 
@@ -371,12 +392,9 @@ parseId students =
     String.toInt >> mfilter (not << flip List.member (List.map .id students))
 
 
-addMenu : List Student -> Menu -> Element Msg
-addMenu students menu =
-    El.column
-        [ El.spacing StyleVars.standardSpacing
-        , El.padding StyleVars.standardPadding
-        ]
+studentMenu : List Student -> Menu -> Element Msg
+studentMenu students menu =
+    El.column []
         [ entryRow
             { onChange = NameUpdate
             , text = menu.name
@@ -531,7 +549,7 @@ init
     { width
     , students
     } =
-    { menu = Nothing
+    { menu = AllClosed
     , data = students
     , width = width
     }
