@@ -41,11 +41,9 @@ def create():
     try:  
         result = students.insert_one(json)
     except Exception as e:
-        return "EXCEPTION: ", e
-    else:
+        print("EXCEPTION: " + str(e))
+    finally:
         return request.data
-
-
 
 @app.route('/read')
 def read():
@@ -84,17 +82,21 @@ def update():
         "Student with ID: " + str(ID) + " does not exist!"
 
 
-@app.route('/delete')
+@app.route('/delete', methods = ['POST'])
 def delete():
-    ID = 1
-    student = findStudent(ID)
-    if student:
-        students.delete_one({'id': ID})
-        return ID
+    data = request.data
+    split = (str(data)[3:len(data)+1]).split(",")
+    if len(split) > 1:
+        students.delete_many({})
     else:
-        return "Student with ID: " + str(ID) + " does not exist!"
+        stringID = split[0]
+        if stringID != '':
+            ID = int(stringID)
+            student = findStudent(ID)
+            if student:
+                students.delete_one({'id': ID})
 
-    # students.delete_one({'id': studentID})
+    return request.data
 
 @app.route('/raf')
 def raf():
